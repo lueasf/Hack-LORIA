@@ -7,12 +7,7 @@ import time
 import shutil
 import math
 from codecarbon import EmissionsTracker
-
-# optional pandas for CSV table/plot
-try:
-    import pandas as pd
-except Exception:
-    pd = None
+import pandas as pd
 
 # fixed project name (removed option from sidebar as requested)
 project_name = "streamlit_codecarbon"
