@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import time
 from pathlib import Path
 
 # -----------------------------
@@ -45,6 +46,10 @@ if "current_response" not in st.session_state:
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
 
+if "last_tdev" not in st.session_state:
+    # dernier temps de développement (s) mesuré entre envoi et réception
+    st.session_state.last_tdev = 0.0
+
 
 # -----------------------------
 # CALLBACKS
@@ -74,22 +79,59 @@ def call_llm_api(prompt, model_name):
     return f"[FAKE RESPONSE from {model_name}] for prompt: {prompt}"
 
 
-def compute_carbon(model_name, prompt, response):
+def compute_carbon(model_name, prompt, response, tdev):
     """
     Stub pour calculer l'empreinte carbone.
     Remplace par ta vraie fonction.
     """
-    # Ex : carbon.compute(model_name, len(prompt), len(response))
-    return 0.123  # placeholder
+    # Assumptions :
+    hardware_profiles = {
+        "openai/gpt-3.5": {
+            "device_count": 2,     
+            "device_power_kw": 0.6,
+            "chip_type": "H100"
+        },
+    }
+
+    # Si modèle inconnu
+    profile = hardware_profiles.get(model_name, {
+        "device_count": 1, "device_power_kw": 0.5, "chip_type": "H100"
+    })
+
+    P = profile["device_count"] * profile["device_power_kw"]  # Puissance totale (kW)
+    PUE = 1.1
+    Ci = {"us": 0.4, "fr": 0.06} # kg CO2e/kWh
+
+    tdev_h = tdev / 3600  # conversion secondes -> heures
+
+    # Calcul de l'empreinte carbone
+    operational_carbon = P * PUE * Ci["us"] * tdev_h
+
+    # C02 de fabrication du matériel (valeur du papier)
+    cpu = 1.47 # kg
+    DRAM = 102.4 # kg
+    SSD = 576 # kg
+    H100 = 14.652 # kg
+    total_hardware_co2 = cpu + DRAM + SSD + H100
+
+    LT = 4 * 365.25 * 24 # Durée de vie du matériel en heures
+
+    hardware_carbon = (tdev_h / LT) * total_hardware_co2
+
+    total_carbon = (operational_carbon + hardware_carbon) * 1000 # Conversion en grammes
+
+    return total_carbon
 
 
-def save_session_entry(prompt, model_name, response, carbon):
+def save_session_entry(prompt, model_name, response, carbon, tdev_seconds):
+    """Enregistre une entrée de session incluant le temps de réponse (tdev en secondes)."""
     session_data = load_json(SESSION_FILE)
     session_data.append({
         "prompt": prompt,
         "model": model_name,
         "response": response,
-        "carbon": carbon
+        "carbon": carbon,
+        "tdev_seconds": tdev_seconds,
     })
     save_json(SESSION_FILE, session_data)
 
@@ -142,7 +184,7 @@ model_list = [
     "groq/llama3-8b",
     "groq/mixtral-8x7b",
     "openai/gpt-4.1-mini",
-    "openai/gpt-4.1",
+    "openai/gpt-3.5",
 ]
 
 st.session_state.selected_model = st.selectbox(
@@ -162,11 +204,15 @@ if st.session_state.selected_model is None:
 st.subheader("3. Réponse du modèle")
 
 if st.button("Envoyer le prompt au modèle"):
+    # Mesure du temps écoulé entre l'envoi et la réception (tdev)
+    start = time.time()
     response = call_llm_api(
-        st.session_state.current_prompt, 
-        st.session_state.selected_model
+        st.session_state.current_prompt,
+        st.session_state.selected_model,
     )
+    tdev = time.time() - start
     st.session_state.current_response = response
+    st.session_state.last_tdev = tdev
 
 if st.session_state.current_response:
     st.write("### Réponse :")
@@ -183,16 +229,21 @@ if st.session_state.current_response:
         st.session_state.selected_model,
         st.session_state.current_prompt,
         st.session_state.current_response,
+        st.session_state.last_tdev,
     )
 
-    st.metric(label="Empreinte carbone (kg CO₂e)", value=f"{carbon:.4f}")
+    st.metric(label="Empreinte carbone (g CO₂e)", value=f"{carbon:.4f}")
 
-    # Sauvegarde
+    # Affichage du temps de réponse
+    st.metric(label="Temps de réponse (s)", value=f"{st.session_state.last_tdev:.3f}")
+
+    # Sauvegarde (inclut tdev)
     save_session_entry(
         st.session_state.current_prompt,
         st.session_state.selected_model,
         st.session_state.current_response,
-        carbon
+        carbon,
+        st.session_state.last_tdev,
     )
 
 
