@@ -1,0 +1,14 @@
+[
+  {
+    "prompt": "Merci",
+    "model": "groq/llama3-8b",
+    "response": "[FAKE RESPONSE from groq/llama3-8b] for prompt: Merci",
+    "carbon": 0.123
+  },
+  {
+    "prompt": "bonjour",
+    "model": "groq/llama3-8b",
+    "response": "[FAKE RESPONSE from groq/llama3-8b] for prompt: bonjour",
+    "carbon": 0.123
+  }
+]
