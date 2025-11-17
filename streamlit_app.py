@@ -32,6 +32,8 @@ if run:
     else:
         tmpdir = tempfile.mkdtemp(prefix="codecarbon_streamlit_")
         script_path = os.path.join(tmpdir, "script.py")
+        repetitions = st.number_input("Répétitions (exécuter N fois)", min_value=1, value=1)
+        intensity_override = st.number_input("Hypothèse intensité carbone (kg CO2/kWh)", min_value=0.0, value=0.3, format="%.3f")
         try:
             # write the code
             if uploaded_file is not None:

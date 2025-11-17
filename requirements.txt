@@ -1,3 +1,4 @@
 streamlit
 codecarbon
 psutil
+pandas

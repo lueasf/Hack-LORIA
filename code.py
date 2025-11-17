@@ -25,7 +25,7 @@ def compute_primes(limit):
 def main():
     start = time.time()
     print("Démarrage du calcul des nombres premiers...")
-    limit = 20000  # augmentez si vous voulez plus de charge CPU
+    limit = 200000
     primes = compute_primes(limit)
     end = time.time()
     print(f"Nombre de premiers <= {limit} : {len(primes)}")
