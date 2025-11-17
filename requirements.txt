@@ -2,3 +2,7 @@ streamlit
 codecarbon
 psutil
 pandas
+openai
+requests
+google-genai
+groq
