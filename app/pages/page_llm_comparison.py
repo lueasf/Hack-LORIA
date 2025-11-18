@@ -3,11 +3,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 import streamlit as st
-import json
 import time
 from pathlib import Path
 from backend.config import MODELS_LIST
 from backend.llm_caller import call_llm
+from backend.utils import load_json, save_json
+from backend.compute_LLM_footprint import compute_carbon
 
 # -----------------------------
 # CONFIGURATION DE LA PAGE
@@ -31,20 +32,6 @@ if not PROMPTS_FILE.exists():
 
 if not SESSION_FILE.exists():
     SESSION_FILE.write_text("[]")
-
-
-# -----------------------------
-# FONCTIONS UTILITAIRES
-# -----------------------------
-def load_json(path):
-    try:
-        return json.loads(path.read_text())
-    except:
-        return []
-
-def save_json(path, data):
-    path.write_text(json.dumps(data, indent=2))
-
 
 # -----------------------------
 # INITIALISATION SESSION STATE
@@ -86,50 +73,6 @@ def new_prompt():
     st.session_state.current_prompt = ""
     st.session_state.current_response = ""
     st.session_state.selected_model = None
-
-def compute_carbon(model_name, prompt, response, tdev):
-    """
-    Stub pour calculer l'empreinte carbone.
-    Remplace par ta vraie fonction.
-    """
-    # Assumptions :
-    hardware_profiles = {
-        "openai/gpt-3.5": {
-            "device_count": 2,     
-            "device_power_kw": 0.6,
-            "chip_type": "H100"
-        },
-    }
-
-    # Si modèle inconnu
-    profile = hardware_profiles.get(model_name, {
-        "device_count": 1, "device_power_kw": 0.5, "chip_type": "H100"
-    })
-
-    P = profile["device_count"] * profile["device_power_kw"]  # Puissance totale (kW)
-    PUE = 1.1
-    Ci = {"us": 0.4, "fr": 0.06} # kg CO2e/kWh
-
-    tdev_h = tdev / 3600  # conversion secondes -> heures
-
-    # Calcul de l'empreinte carbone
-    operational_carbon = P * PUE * Ci["us"] * tdev_h
-
-    # C02 de fabrication du matériel (valeur du papier)
-    cpu = 1.47 # kg
-    DRAM = 102.4 # kg
-    SSD = 576 # kg
-    H100 = 14.652 # kg
-    total_hardware_co2 = cpu + DRAM + SSD + H100
-
-    LT = 4 * 365.25 * 24 # Durée de vie du matériel en heures
-
-    hardware_carbon = (tdev_h / LT) * total_hardware_co2
-
-    total_carbon = (operational_carbon + hardware_carbon) * 1000 # Conversion en grammes
-
-    return total_carbon
-
 
 def save_session_entry(prompt, model_name, response, carbon, tdev_seconds):
     """Enregistre une entrée de session incluant le temps de réponse (tdev en secondes)."""
@@ -249,8 +192,7 @@ if st.session_state.current_response:
     # Sinon, si la réponse est bien une chaîne de caractères (cas du succès)
     elif isinstance(response_data, str):
         st.markdown("**Réponse du modèle :**")
-        # st.markdown(f"```\n{response_data}\n```")
-        st.markdown(response_data) # Affiche directement le markdown formaté
+        st.markdown(f"```\n{response_data}\n```")
         
     # Cas de sécurité si la réponse n'est ni un dictionnaire d'erreur, ni une string
     else:
