@@ -9,6 +9,8 @@ from backend.config import MODELS_LIST
 from backend.llm_caller import call_llm
 from backend.utils import load_json, save_json
 from backend.compute_LLM_footprint import compute_carbon
+from app.page_llm_calcul import show_calculation
+
 
 # -----------------------------
 # CONFIGURATION DE LA PAGE
@@ -239,12 +241,9 @@ if st.session_state.current_response:
         # réinitialiser le marqueur pour éviter de resauvegarder lors des reruns
         st.session_state.pending_save = False
 
-    import streamlit as st
-
     # Importation locale (lazy import) : 
     # Le module n'est importé que lorsque Python lit cette ligne, pas au démarrage du script.
     def afficher_details():
-        from page_llm_calcul import show_calculation
         show_calculation()
 
     # Le composant natif pour afficher/masquer
