@@ -227,6 +227,17 @@ if st.session_state.current_response:
         st.session_state.last_tdev,
     )
 
+    import streamlit as st
+
+    # Importation locale (lazy import) : 
+    # Le module n'est importé que lorsque Python lit cette ligne, pas au démarrage du script.
+    def afficher_details():
+        from page_llm_calcul import show_calculation
+        show_calculation()
+
+    # Le composant natif pour afficher/masquer
+    with st.expander("Voir l'explication détaillée"):
+        afficher_details()
 
 # -------------------------------------------------
 # 5. Visualisation de session (placeholder)
