@@ -239,6 +239,17 @@ if st.session_state.current_response:
         # réinitialiser le marqueur pour éviter de resauvegarder lors des reruns
         st.session_state.pending_save = False
 
+    import streamlit as st
+
+    # Importation locale (lazy import) : 
+    # Le module n'est importé que lorsque Python lit cette ligne, pas au démarrage du script.
+    def afficher_details():
+        from page_llm_calcul import show_calculation
+        show_calculation()
+
+    # Le composant natif pour afficher/masquer
+    with st.expander("Voir l'explication détaillée"):
+        afficher_details()
 
 # -------------------------------------------------
 # 5. Visualisation de session (placeholder)
