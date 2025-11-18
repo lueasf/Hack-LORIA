@@ -185,7 +185,7 @@ with col2:
     st.subheader("🌍 CodeCarbon")
     st.write("Mesurez l'empreinte carbone de vos scripts.")
     if st.button("Lancer le calculateur"):
-        st.switch_page("pages/2_🌍_Calculateur_d_Empreinte_Carbone_De_Code.py")
+        st.switch_page("pages/2_⚙️_Calculateur_d_Empreinte.py")
 
 # La barre latérale affichera également la navigation
 st.sidebar.success("Sélectionnez une page ci-dessus.")
