@@ -1,20 +1,19 @@
 from openai import OpenAI
 from google import genai
 from groq import Groq
-from backend.config import API_KEYS, MODELS_LIST
+from .config import API_KEYS, MODELS_LIST
 
-def call_openai(api_key, prompt, model="gpt-3.5-turbo", temperature=0.7):
+def call_openai(api_key, prompt, model):
     client = OpenAI(api_key=api_key)
 
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
-        temperature=temperature
     )
 
     return response.choices[0].message.content
 
-def call_gemini(api_key, prompt, model="gemini-2.5-flash"):
+def call_gemini(api_key, prompt, model):
     client = genai.Client(api_key=api_key)
 
     response = client.models.generate_content(
@@ -24,7 +23,7 @@ def call_gemini(api_key, prompt, model="gemini-2.5-flash"):
 
     return response.text
 
-def call_groq(api_key, prompt, model="llama-3.3-70b-versatile"):
+def call_groq(api_key, prompt, model):
     client = Groq(api_key=api_key)
 
     response = client.chat.completions.create(
@@ -34,7 +33,7 @@ def call_groq(api_key, prompt, model="llama-3.3-70b-versatile"):
 
     return response.choices[0].message.content
 
-def call_llm(provider, prompt, model=""):
+def call_llm(provider, prompt, model):
     provider = provider.lower()
     api_key = ""
 
@@ -64,10 +63,14 @@ def call_llm(provider, prompt, model=""):
 
 # Exemple d'utilisation avec openai
 if __name__ == "__main__":
+
+    # Attention : pour tester ce script, il faut le lancer avec la commande suivante : python -m backend.llm_caller
+    # impossible de le lancer directement car il fait partie d'un package
     provider = "openai"  # ou "gemini", "groq"
+    model = "gpt-3.5-turbo"
 
     prompt = "Écris-moi un poème sur la lune."
     print("Appel du LLM avec le provider :", provider)
     
-    result = call_llm(provider, prompt)
+    result = call_llm(provider, prompt, model)
     print("Réponse du modèle :", result)
