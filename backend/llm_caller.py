@@ -46,10 +46,34 @@ def call_groq(api_key, prompt, model):
         )
         return response.choices[0].message.content
     except GroqAPIError as e:
-        # Gère spécifiquement les erreurs de l'API Groq.
-        error_message = f"Erreur de l'API Groq : {e.status_code} - {e.body.get('error', {}).get('message', 'Erreur inconnue') if e.body else 'Aucun détail'}"
-        print(error_message)
-        return {"error": error_message}
+        error_details = "Détails non disponibles"
+        
+        if e.body:
+            if isinstance(e.body, dict):
+                # Cas 1 : L'erreur est un JSON propre, on l'analyse
+                error_details = e.body.get('error', {}).get('message', str(e.body))
+            else:
+                # Cas 2 : L'erreur n'est pas un dictionnaire (string, HTML...)
+                body_str = str(e.body).strip()
+                
+                # On vérifie si la chaîne ressemble à du HTML
+                if body_str.lower().startswith('<!doctype html'):
+                    # Si c'est du HTML, on crée un message d'erreur clair et concis
+                    error_details = (
+                        "Le service a rencontré une erreur interne (probablement une erreur 5xx de Cloudflare). "
+                        "Le service est peut-être temporairement indisponible."
+                    )
+                else:
+                    # Si c'est une autre chaîne, on l'affiche (en la tronquant si elle est trop longue)
+                    error_details = (body_str[:250] + '...') if len(body_str) > 250 else body_str
+        
+        # Ce message est pour les logs côté backend
+        full_error_message = f"Erreur de l'API Groq : {e.status_code} - {error_details}"
+        print(full_error_message)
+        
+        # On retourne un message simple et propre pour le front-end
+        return {"error": f"Une erreur est survenue avec l'API Groq (code {e.status_code}). Veuillez réessayer plus tard."}
+        
     except Exception as e:
         # Gère les autres erreurs (ex: problème de connexion)
         error_message = f"Une erreur inattendue est survenue avec Groq : {e}"
