@@ -18,7 +18,7 @@ from app.page_llm_calcul import show_calculation
 st.set_page_config(
     page_title="LLM Comparison & Carbon Tracking",
     page_icon="🤖",
-    layout="centered",
+    layout="wide",
 )
 
 # -----------------------------

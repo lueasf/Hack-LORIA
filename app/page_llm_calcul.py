@@ -9,7 +9,7 @@ from backend.config import (
 )
 
 def show_calculation():
-    st.set_page_config(page_title="Comprendre l'empreinte", layout="centered")
+    st.set_page_config(page_title="Comprendre l'empreinte", layout="wide")
     
     st.markdown(
         """

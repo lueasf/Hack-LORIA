@@ -20,7 +20,7 @@ MODELS_LIST = {
 # Variables globales pour compute_LLM_footprint.py
 
 HARDWARE_PROFILES = {
-    "openai/gpt-3.5-turbo": {
+    "gpt-3.5-turbo": {
         "device_count": 2,
         "device_power_kw": 0.6,
         "chip_type": "H100",
