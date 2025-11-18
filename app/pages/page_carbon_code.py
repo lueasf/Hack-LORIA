@@ -97,6 +97,9 @@ if run:
             end_time = time.time()
             duration = end_time - start_time
 
+        # path to CSV (available after tracker run)
+        csv_path = os.path.join(tmpdir, "emissions.csv")
+
         st.write("### Résultats de l'exécution")
         st.write(f"Return code: `{returncode}`")
         st.write(f"Durée mesurée: `{duration:.3f}` s")
@@ -127,9 +130,79 @@ if run:
             avg_g = total_g / max(1, int(repetitions))
             st.write(f"**Total:** {total_g:.6f} g CO2eq - **Par run (moyenne):** {avg_g:.6f} g")
 
-            meters_car = (total_g / 120.0) * 1000.0
+            # Try to estimate energy (kWh) precisely: prefer CSV fields if available, else derive from emissions using a default intensity
+            energy_kwh = None
+            df2 = None
+            try:
+                if os.path.exists(csv_path):
+                    df2 = pd.read_csv(csv_path)
+                    if 'energy_consumed' in df2.columns:
+                        energy_kwh = float(df2['energy_consumed'].iloc[-1])
+                    elif 'estimated_energy_Wh' in df2.columns:
+                        energy_kwh = float(df2['estimated_energy_Wh'].iloc[-1]) / 1000.0
+                    else:
+                        # try to compute from last reported powers
+                        power_sum_local = 0.0
+                        if 'cpu_power' in df2.columns:
+                            power_sum_local += float(df2['cpu_power'].iloc[-1] or 0.0)
+                        if 'ram_power' in df2.columns:
+                            power_sum_local += float(df2['ram_power'].iloc[-1] or 0.0)
+                        if 'gpu_power' in df2.columns:
+                            power_sum_local += float(df2['gpu_power'].iloc[-1] or 0.0)
+                        if power_sum_local > 0.0:
+                            energy_kwh = power_sum_local * float(duration) / 3600.0
+            except Exception:
+                energy_kwh = None
+
+            # fallback: derive energy from emissions using an intensity value (g CO2 / kWh)
+            if energy_kwh is None:
+                intensity_g_per_kwh = None
+                try:
+                    if df2 is not None:
+                        for col in ('carbon_intensity', 'intensity', 'grid_intensity', 'carbon_intensity_g_per_kwh'):
+                            if col in df2.columns:
+                                intensity_g_per_kwh = float(df2[col].iloc[-1])
+                                break
+                except Exception:
+                    intensity_g_per_kwh = None
+                if intensity_g_per_kwh is None:
+                    intensity_g_per_kwh = 475.0  # fallback world-average g CO2 / kWh
+                energy_kwh = float(total_g) / float(intensity_g_per_kwh)
+
+            # Human-friendly comparisons using energy_kwh where possible
             st.write("#### Comparaisons (approximatives)")
-            st.write(f"~ {meters_car:.2f} mètres en voiture (~120 g CO2/km)")
+
+            # Car: use a default factor (g CO2 per km) and show a small plausible range
+            car_g_per_km = 120.0
+            car_low = 95.0
+            car_high = 150.0
+            km_equiv = total_g / car_g_per_km
+            km_equiv_low = total_g / car_high
+            km_equiv_high = total_g / car_low
+            meters_equiv = km_equiv * 1000.0
+            st.write(f"Voiture : ~ {km_equiv:.3f} km (plage {km_equiv_low:.3f}-{km_equiv_high:.3f} km) : ~{meters_equiv:.0f} m")
+
+            # Energy-based comparisons
+            energy_wh = energy_kwh * 1000.0
+            # smartphone ~10 Wh
+            smartphone_wh = 10.0
+            smartphone_charges = energy_wh / smartphone_wh
+            st.write(f"Equivalent énergie : {energy_kwh:.4f} kWh ~{smartphone_charges:.3f} charges complètes de smartphone (~10 Wh)")
+
+            # laptop ~30 W -> minutes = energy_wh / 30 * 60
+            laptop_w = 30.0
+            laptop_minutes = (energy_wh / laptop_w) * 60.0
+            st.write(f"≈ {laptop_minutes:.1f} minutes d'utilisation d'un laptop (~{laptop_w:.0f} W)")
+
+            # LED 10W seconds
+            led_w = 10.0
+            led_seconds = (energy_wh / led_w) * 3600.0
+            st.write(f"~ {led_seconds:.1f} secondes d'une LED {led_w:.0f} W")
+
+            # 100 W incandescent bulb minutes
+            bulb100_w = 100.0
+            bulb100_minutes = (energy_wh / bulb100_w) * 60.0
+            st.write(f"~ {bulb100_minutes:.2f} minutes d'une ampoule 100 W")
         else:
             st.info("Impossible de convertir les émissions en valeurs numériques (non disponible).")
 
