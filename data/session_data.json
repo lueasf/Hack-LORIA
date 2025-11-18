@@ -22,5 +22,26 @@
     "model": "gpt-3.5-turbo",
     "response": "De rien, c'est un plaisir d'aider! N'h\u00e9sitez pas si vous avez d'autres questions.",
     "carbon": 0.123
+  },
+  {
+    "prompt": "fais une chanson",
+    "model": "gpt-3.5-turbo",
+    "response": "Refrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nCouplet 1:\nChaque jour est une nouvelle page\n\u00c0 nous de l'\u00e9crire avec courage\nMalgr\u00e9 les \u00e9preuves et les tourments\nOn garde espoir et on avance fi\u00e8rement\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nCouplet 2:\nOn n'a qu'une vie \u00e0 vivre\nAlors autant en profiter, en rire\nSe relever \u00e0 chaque chute\nEt garder la t\u00eate haute malgr\u00e9 les disputes\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nPont:\nPeu importe les \u00e9preuves\nOn reste debout, on se rel\u00e8ve\nCar la vie est un d\u00e9fi \u00e0 relever\nEt c'est en avan\u00e7ant qu'on peut briller\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nOutro:\nAlors n'abandonne jamais, garde espoir\nCar m\u00eame dans l'obscurit\u00e9, tu peux voir\nLa lumi\u00e8re au bout du tunnel\nC'est en avan\u00e7ant qu'on devient immortel.",
+    "carbon": 0.27640059705175346,
+    "tdev_seconds": 4.149341106414795
+  },
+  {
+    "prompt": "fais une chanson",
+    "model": "llama-3.3-70b-versatile",
+    "response": "Refrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nCouplet 1:\nChaque jour est une nouvelle page\n\u00c0 nous de l'\u00e9crire avec courage\nMalgr\u00e9 les \u00e9preuves et les tourments\nOn garde espoir et on avance fi\u00e8rement\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nCouplet 2:\nOn n'a qu'une vie \u00e0 vivre\nAlors autant en profiter, en rire\nSe relever \u00e0 chaque chute\nEt garder la t\u00eate haute malgr\u00e9 les disputes\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nPont:\nPeu importe les \u00e9preuves\nOn reste debout, on se rel\u00e8ve\nCar la vie est un d\u00e9fi \u00e0 relever\nEt c'est en avan\u00e7ant qu'on peut briller\n\nRefrain:\nDans la vie il faut avancer\nSurmonter les obstacles, les d\u00e9fier\nRester fort, ne jamais flancher\nCar c'est \u00e7a le secret pour briller\n\nOutro:\nAlors n'abandonne jamais, garde espoir\nCar m\u00eame dans l'obscurit\u00e9, tu peux voir\nLa lumi\u00e8re au bout du tunnel\nC'est en avan\u00e7ant qu'on devient immortel.",
+    "carbon": 0.27640059705175346,
+    "tdev_seconds": 4.149341106414795
+  },
+  {
+    "prompt": "fais une chanson",
+    "model": "llama-3.3-70b-versatile",
+    "response": "Voici une chanson que j'ai cr\u00e9\u00e9e pour vous :\n\n**Titre :** \"Sous les \u00e9toiles\"\n\n**Couplet 1 :**\nJe me prom\u00e8ne sous les \u00e9toiles,\nLe ciel est rempli de lumi\u00e8res,\nLes r\u00eaves sont faits pour \u00eatre suivis,\nEt je sens mon c\u0153ur qui bat plus fort.\n\n**Refrain :**\nSous les \u00e9toiles, je me sens libre,\nMon esprit s'envole, sans limite,\nJe suis moi-m\u00eame, sans crainte ni peur,\nSous les \u00e9toiles, je trouve mon bonheur.\n\n**Couplet 2 :**\nLa nuit est calme, les \u00e9toiles brillent,\nJe sens la paix qui m'entoure,\nLes soucis s'\u00e9loignent, les r\u00eaves se rapprochent,\nEt je me sens vivant, comme jamais.\n\n**Refrain :**\nSous les \u00e9toiles, je me sens libre,\nMon esprit s'envole, sans limite,\nJe suis moi-m\u00eame, sans crainte ni peur,\nSous les \u00e9toiles, je trouve mon bonheur.\n\n**Pont :**\nJe ne sais pas ce que demain apportera,\nMais pour l'instant, je suis heureux,\nDe pouvoir vivre, de pouvoir r\u00eaver,\nEt de sentir mon c\u0153ur qui bat.\n\n**Refrain :**\nSous les \u00e9toiles, je me sens libre,\nMon esprit s'envole, sans limite,\nJe suis moi-m\u00eame, sans crainte ni peur,\nSous les \u00e9toiles, je trouve mon bonheur.\n\nJ'esp\u00e8re que vous avez aim\u00e9 cette chanson ! N'h\u00e9sitez pas \u00e0 me demander si vous voulez que je fasse des changements ou si vous avez des pr\u00e9f\u00e9rences pour un nouveau titre.",
+    "carbon": 0.12385281636895834,
+    "tdev_seconds": 1.8592853546142578
   }
 ]
