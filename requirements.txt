@@ -7,3 +7,4 @@ requests
 google-genai
 groq
 python-dotenv
+plotly-express
