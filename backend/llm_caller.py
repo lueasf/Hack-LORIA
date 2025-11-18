@@ -1,5 +1,5 @@
 from openai import OpenAI, APIError
-from google.genai import Client as GenAIClient
+from google import genai
 from groq import Groq, APIError as GroqAPIError
 from .config import API_KEYS, MODELS_LIST
 
@@ -24,10 +24,11 @@ def call_openai(api_key, prompt, model):
 
 def call_gemini(api_key, prompt, model):
     try:
-        client = GenAIClient(api_key=api_key)
-        response = client.get_model(model).generate_content(
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model=model,
             contents=prompt
-        )
+            )
         return response.text
     except Exception as e:
         # La bibliothèque de Google peut lever des exceptions variées,
@@ -104,8 +105,8 @@ if __name__ == "__main__":
 
     # Attention : pour tester ce script, il faut le lancer avec la commande suivante : python -m backend.llm_caller
     # impossible de le lancer directement car il fait partie d'un package
-    provider = "openai"  # ou "gemini", "groq"
-    model = "gpt-3.5-turbo"
+    provider = "groq"  # ou "gemini", "groq"
+    model = ""
 
     prompt = "Écris-moi un poème sur la lune."
     print("Appel du LLM avec le provider :", provider)
