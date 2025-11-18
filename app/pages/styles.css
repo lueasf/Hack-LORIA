@@ -1,0 +1,230 @@
+/* Masquer les éléments Streamlit par défaut SAUF le bouton sidebar */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: visible !important;}
+
+/* Fond et couleurs */
+.stApp {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1d3a 100%);
+}
+
+/* Container principal */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+}
+
+/* Titre principal */
+h1 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+/* Sous-titre */
+.subtitle {
+    color: #a0aec0;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+/* Cards avec effet glassmorphism */
+.metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    margin-bottom: 1rem;
+}
+
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background: rgba(26, 29, 58, 0.95);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-testid="stSidebar"] h2 {
+    color: #667eea;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+/* Input fields */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stNumberInput > div > div > input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    padding: 0.75rem;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stNumberInput > div > div > input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 1px #667eea;
+}
+
+/* Boutons */
+.stButton > button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+}
+
+/* Download button */
+.stDownloadButton > button {
+    background: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+    border: 1px solid #48bb78;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.stDownloadButton > button:hover {
+    background: rgba(72, 187, 120, 0.3);
+}
+
+/* Metrics */
+[data-testid="stMetricValue"] {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #a0aec0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Expanders */
+.streamlit-expanderHeader {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+.streamlit-expanderHeader:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #667eea;
+}
+
+/* Code blocks */
+.stCodeBlock {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tables */
+.stTable {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+/* Alerts */
+.stAlert {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+/* Success/Info/Warning/Error colors */
+[data-baseweb="notification"] {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+}
+
+/* Select box */
+.stSelectbox > div > div {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+}
+
+/* Divider */
+hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 2rem 0;
+}
+
+/* Section headers */
+h3 {
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h4 {
+    color: #cbd5e0;
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+}
+
+/* Comparison items */
+.comparison-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    border-left: 3px solid #667eea;
+}
+
+/* Show sidebar toggle button */
+button[kind="header"] {
+    display: block !important;
+    background: rgba(102, 126, 234, 0.2) !important;
+    color: white !important;
+    border: 1px solid rgba(102, 126, 234, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+button[kind="header"]:hover {
+    background: rgba(102, 126, 234, 0.3) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    transform: translateY(-2px) !important;
+}

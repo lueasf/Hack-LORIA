@@ -9,27 +9,77 @@ import pandas as pd
 
 project_name = "streamlit_codecarbon"
 
-st.set_page_config(page_title="Mesure d'empreinte avec CodeCarbon", layout="wide")
-st.title("Mesure d'empreinte carbone d'un script avec CodeCarbon")
-
-st.markdown(
-    "Uploadez un fichier Python ou collez votre code et fournissez une commande à exécuter, puis cliquez sur \"Run & measure\".\n\n"
+st.set_page_config(
+    page_title="Carbon Footprint Analyzer for Code",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
+# Charger le CSS externe
+def load_css(file_path):
+    with open(file_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
+
+st.markdown('<h1>Carbon Footprint Analyzer for Code</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Mesurez précisément l\'empreinte carbone de vos scripts et commandes avec CodeCarbon</p>', unsafe_allow_html=True)
+
 with st.sidebar:
-    st.header("Options")
-    timeout = st.number_input("Timeout (secondes)", min_value=1, value=60)
-    measure_power_secs = st.number_input("Intervalle de mesure (s)", min_value=1, value=1)
-    repetitions = st.number_input("Répétitions (exécuter N fois)", min_value=1, value=1)
+    st.markdown("## Configuration")
+    
+    st.markdown("### Paramètres d'exécution")
+    timeout = st.number_input("Timeout (secondes)", min_value=1, value=60, help="Durée maximale d'exécution autorisée")
+    measure_power_secs = st.number_input("Intervalle de mesure (s)", min_value=1, value=1, help="Fréquence d'échantillonnage de la puissance")
+    repetitions = st.number_input("Répétitions", min_value=1, value=1, help="Nombre d'exécutions pour améliorer la précision")
+    
     st.markdown("---")
-    st.markdown("Mode d'exécution : choisissez si vous voulez exécuter un script Python (upload/coller) ou un script d'un autre langage.")
-    run_mode = st.selectbox("Mode d'exécution", ["Script Python", "Autre"])
+    
+    st.markdown("### Mode d'exécution")
+    run_mode = st.selectbox(
+        "Type de code",
+        ["Script Python", "Autre"],
+        help="Choisissez Python pour du code Python, ou Autre pour n'importe quelle commande shell"
+    )
+    
+    st.markdown("---")
+    
+    st.markdown("### Ressources")
+    st.markdown("[Documentation CodeCarbon](https://codecarbon.io/)")
+    st.markdown("[Sources méthodologie](https://github.com/mlco2/codecarbon)")
 
-uploaded_file = st.file_uploader("Upload .py file", type=["py"]) 
-code_text = st.text_area("Ou collez votre code ici")
-command_text = st.text_input("Commande à exécuter (pour mode 'Autre')")
+# Main content area
+col_space1, col_upload, col_or, col_space2 = st.columns([1, 2, 0.5, 1])
 
-run = st.button("Run & measure")
+with col_upload:
+    uploaded_file = st.file_uploader(
+        "Uploader un fichier",
+        type=["py"],
+        help="Sélectionnez un fichier .py à analyser"
+    )
+
+with col_or:
+    st.markdown("### ")  # Spacing
+    st.markdown("<div style='text-align: center;'>ou</div>", unsafe_allow_html=True)
+
+code_text = st.text_area(
+    "Code source",
+    height=200,
+    placeholder="Collez votre code Python ici...",
+    help="Entrez directement votre code à analyser"
+)
+
+command_text = st.text_input(
+    "Commande (mode 'Autre')",
+    placeholder="Ex: javac code.java && java Main",
+    help="Commande shell à exécuter et mesurer"
+)
+
+st.markdown("---")
+
+col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+with col_btn2:
+    run = st.button("Analyser l'empreinte carbone", use_container_width=True)
 
 if run:
     if run_mode == "Script Python":
@@ -100,19 +150,28 @@ if run:
         # path to CSV (available after tracker run)
         csv_path = os.path.join(tmpdir, "emissions.csv")
 
-        st.write("### Résultats de l'exécution")
-        st.write(f"Return code: `{returncode}`")
-        st.write(f"Durée mesurée: `{duration:.3f}` s")
+        st.markdown("---")
+        st.markdown("## Résultats de l'exécution")
+        
+        col_res1, col_res2, col_res3 = st.columns(3)
+        with col_res1:
+            status_text = "Succès" if returncode == 0 else "Erreur"
+            st.metric("Statut", f"{status_text} (code {returncode})")
+        with col_res2:
+            st.metric("Durée", f"{duration:.3f} s")
+        with col_res3:
+            st.metric("Répétitions", int(repetitions))
+        
         if timed_out:
             st.error("Le script a dépassé le timeout spécifié.")
 
-        with st.expander("Stdout"):
-            st.code(run_stdout)
-        with st.expander("Stderr"):
-            st.code(run_stderr)
+        with st.expander("Voir la sortie standard (stdout)", expanded=False):
+            st.code(run_stdout, language="text")
+        with st.expander("Voir les erreurs (stderr)", expanded=False):
+            st.code(run_stderr, language="text")
 
-        st.write("---")
-        st.write("### Résultats CodeCarbon")
+        st.markdown("---")
+        st.markdown("## Empreinte carbone")
 
         emissions_kg = None
         try:
@@ -125,10 +184,28 @@ if run:
 
         if emissions_kg is not None:
             emissions_g = emissions_kg * 1000.0
-            st.metric(label="g CO2eq", value=f"{emissions_g:.6f}")
-            total_g = emissions_g
-            avg_g = total_g / max(1, int(repetitions))
-            st.write(f"**Total:** {total_g:.6f} g CO2eq - **Par run (moyenne):** {avg_g:.6f} g")
+            
+            # Affichage principal de l'émission
+            col_main1, col_main2 = st.columns([1, 2])
+            with col_main1:
+                st.metric(
+                    label="Émissions totales",
+                    value=f"{emissions_g:.6f} g",
+                    delta=f"CO₂eq",
+                    help="Grammes de CO₂ équivalent émis"
+                )
+            with col_main2:
+                total_g = emissions_g
+                avg_g = total_g / max(1, int(repetitions))
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div style="font-size: 0.9rem; color: #a0aec0; margin-bottom: 0.5rem;">DÉTAILS</div>
+                    <div style="font-size: 1.1rem; color: #e2e8f0;">
+                        <strong>Total:</strong> {total_g:.6f} g CO₂eq<br>
+                        <strong>Par exécution:</strong> {avg_g:.6f} g CO₂eq
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
             # Try to estimate energy (kWh) precisely: prefer CSV fields if available, else derive from emissions using a default intensity
             energy_kwh = None
@@ -170,7 +247,9 @@ if run:
                 energy_kwh = float(total_g) / float(intensity_g_per_kwh)
 
             # Human-friendly comparisons using energy_kwh where possible
-            st.write("#### Comparaisons (approximatives)")
+            st.markdown("### Équivalences")
+            
+            st.markdown('<div style="margin-top: 1.5rem;">', unsafe_allow_html=True)
 
             # Car: use a default factor (g CO2 per km) and show a small plausible range
             car_g_per_km = 120.0
@@ -180,38 +259,88 @@ if run:
             km_equiv_low = total_g / car_high
             km_equiv_high = total_g / car_low
             meters_equiv = km_equiv * 1000.0
-            st.write(f"Voiture : ~ {km_equiv:.3f} km (plage {km_equiv_low:.3f}-{km_equiv_high:.3f} km) : ~{meters_equiv:.0f} m")
+            
+            st.markdown(f"""
+            <div class="comparison-item">
+                <strong>Transport automobile</strong><br>
+                {km_equiv:.3f} km (plage: {km_equiv_low:.3f}–{km_equiv_high:.3f} km)<br>
+                <span style="color: #a0aec0; font-size: 0.9rem;">≈ {meters_equiv:.0f} mètres parcourus</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             # Energy-based comparisons
             energy_wh = energy_kwh * 1000.0
+            
             # smartphone ~10 Wh
             smartphone_wh = 10.0
             smartphone_charges = energy_wh / smartphone_wh
-            st.write(f"Equivalent énergie : {energy_kwh:.4f} kWh ~{smartphone_charges:.3f} charges complètes de smartphone (~10 Wh)")
+            
+            st.markdown(f"""
+            <div class="comparison-item">
+                <strong>Énergie consommée</strong><br>
+                {energy_kwh:.4f} kWh = {smartphone_charges:.3f} charges de smartphone<br>
+                <span style="color: #a0aec0; font-size: 0.9rem;">Basé sur une batterie de ~10 Wh</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             # laptop ~30 W -> minutes = energy_wh / 30 * 60
             laptop_w = 30.0
             laptop_minutes = (energy_wh / laptop_w) * 60.0
-            st.write(f"≈ {laptop_minutes:.1f} minutes d'utilisation d'un laptop (~{laptop_w:.0f} W)")
+            
+            st.markdown(f"""
+            <div class="comparison-item">
+                <strong>Utilisation laptop</strong><br>
+                {laptop_minutes:.1f} minutes<br>
+                <span style="color: #a0aec0; font-size: 0.9rem;">Basé sur une consommation moyenne de {laptop_w:.0f} W</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             # LED 10W seconds
             led_w = 10.0
             led_seconds = (energy_wh / led_w) * 3600.0
-            st.write(f"~ {led_seconds:.1f} secondes d'une LED {led_w:.0f} W")
+            
+            st.markdown(f"""
+            <div class="comparison-item">
+                <strong>Éclairage LED</strong><br>
+                {led_seconds:.1f} secondes<br>
+                <span style="color: #a0aec0; font-size: 0.9rem;">LED {led_w:.0f} W allumée</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             # 100 W incandescent bulb minutes
             bulb100_w = 100.0
             bulb100_minutes = (energy_wh / bulb100_w) * 60.0
-            st.write(f"~ {bulb100_minutes:.2f} minutes d'une ampoule 100 W")
+            
+            st.markdown(f"""
+            <div class="comparison-item">
+                <strong>Ampoule incandescente</strong><br>
+                {bulb100_minutes:.2f} minutes<br>
+                <span style="color: #a0aec0; font-size: 0.9rem;">Ampoule {bulb100_w:.0f} W allumée</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.info("Impossible de convertir les émissions en valeurs numériques (non disponible).")
+            st.warning("Impossible de convertir les émissions en valeurs numériques (non disponible).")
 
-        csv_path = os.path.join(tmpdir, "emissions.csv")
+        st.markdown("---")
+        st.markdown("## Données détaillées")
+        
         if os.path.exists(csv_path):
-            st.success(f"Fichier emissions CSV disponible: {csv_path}")
             with open(csv_path, "r", encoding="utf-8") as f:
                 csv_data = f.read()
-            st.download_button("Télécharger emissions.csv", csv_data, file_name="emissions.csv", mime="text/csv")
+            
+            col_csv1, col_csv2 = st.columns([2, 1])
+            with col_csv1:
+                st.success(f"Fichier emissions.csv généré")
+            with col_csv2:
+                st.download_button(
+                    "Télécharger CSV",
+                    csv_data,
+                    file_name="emissions.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
 
             try:
                 df = pd.read_csv(csv_path)
@@ -256,55 +385,55 @@ if run:
                     summary['estimated_energy_Wh'] = est_energy_wh
 
                 if summary:
-                    summary_df = pd.DataFrame(list(summary.items()), columns=['metric', 'value'])
-                    st.write("#### Résumé")
-                    st.table(summary_df)
+                    summary_df = pd.DataFrame(list(summary.items()), columns=['Métrique', 'Valeur'])
+                    st.markdown("### Résumé technique")
+                    st.dataframe(summary_df, use_container_width=True, hide_index=True)
 
             except Exception as e:
-                st.info(f"Erreur lors du parsing du CSV: {e}")
+                st.warning(f"Erreur lors du parsing du CSV: {e}")
         else:
             st.info("Aucun CSV généré par CodeCarbon dans le dossier temporaire.")
 
-        st.write("---")
-        st.write("Dossier temporaire (conserver pour debug):")
-        st.code(tmpdir)
+        with st.expander("Informations de débogage", expanded=False):
+            st.code(f"Dossier temporaire: {tmpdir}", language="text")
+            st.caption("Vous pouvez supprimer ce dossier manuellement si nécessaire.")
+    
+    except Exception as e:
+        st.error(f"Une erreur est survenue: {e}")
 
-    finally:
-        st.write("Vous pouvez supprimer le dossier temporaire manuellement si souhaité.")
-        pass
+st.markdown("---")
 
-with st.expander("Détails techniques : comment l'application mesure et calcule"):
+st.markdown("---")
+
+with st.expander("Méthodologie technique", expanded=False):
     st.markdown("""
-    Le script est validé à l'entrée et on crée un dossier temporaire où le déposer.
 
-    Nous initialisons ensuite le contexte de mesure :
-
+    ### Processus de mesure
+    
+    **1. Validation et préparation**  
+    Le script est validé à l'entrée et sauvegardé dans un dossier temporaire où seront placés les fichiers de sortie.
+    
+    **2. Mesure encapsulée**  
+    L'exécution se fait sous un contexte `EmissionsTracker` qui démarre automatiquement et garantit l'arrêt du scheduler.
+    
     ```python
     with EmissionsTracker(project_name=..., output_dir=tmpdir, measure_power_secs=...) as tracker:
     ```
-
-    Cette ligne instancie le tracker et le démarre à l'entrée du `with` (équivalent à `tracker.start()`), puis l'arrête automatiquement à la sortie (`tracker.stop()`). Par défaut, les résultats sont loggés dans `emissions.csv` dans `output_dir`.
-
-    Ce que CodeCarbon met en place au démarrage :
-    - Le tracker crée un `ResourceTracker` et un scheduler périodique qui échantillonne la puissance toutes les `measure_power_secs` secondes (15s par défaut dans CodeCarbon; ici on permet d'utiliser 1s). Cet échantillonnage est la base du calcul d'énergie.
-    - Il choisit les capteurs selon la machine : sur CPU il tentera d'abord une mesure matérielle (RAPL sur Linux, `powermetrics` sur macOS). Si ces capteurs sont indisponibles comme sur WSL par exemple, CodeCarbon bascule en mode de repli : il mappe votre CPU à une base de TDP (Intel/AMD) puis estime la puissance à partir du TDP et de la charge CPU (via `psutil`).
-    - Il prépare la sortie (un "output sink") : par défaut un `FileOutput` qui écrira des lignes dans `emissions.csv`.
-    - Il résout le contexte géographique (pays / cloud) pour obtenir un facteur d'intensité carbone (g CO₂/kWh).
-
-    Pendant que le script tourne :
-    - L'application lance N fois l'exécution via `subprocess.run(...)`). Pendant cette période, le scheduler continue d'échantillonner CPU/GPU/RAM (sur l'ensemble de la machine en mode par défaut), cumule l'énergie et journalise les mesures.
-    - À chaque tick, CodeCarbon convertit la puissance instantanée (W) en énergie (Wh) par intégration temporelle :
-
+    
+    **3. Échantillonnage et capteurs**  
+    Un scheduler échantillonne la puissance CPU/GPU/RAM selon l'intervalle configuré. CodeCarbon utilise prioritairement des capteurs matériels (RAPL sur Linux, powermetrics sur macOS). En leur absence, il retombe sur une estimation via TDP + charge CPU.
+    
+    **4. Calcul et sortie**  
+    La puissance (W) est intégrée dans le temps pour obtenir l'énergie (Wh → kWh), convertie en émissions via l'intensité carbone locale, et journalisée dans `emissions.csv`.
     ```text
     E ~ Σ P_moy x Δt
     ```
-
-    Il s'agit de la somme des puissances moyennes sur chaque intervalle multipliées par la durée de l'intervalle).
-
-    - L'énergie totale (kWh) est ensuite multipliée par l'intensité carbone locale (g CO₂/kWh) pour produire les émissions (g CO₂e).
-
-    À la sortie du `with` (arrêt) : `tracker.stop()` arrête le scheduler, vide les dernières mesures, calcule les totaux (énergie, émissions) et retourne les émissions totales en kg CO₂e (l'application convertit ensuite en grammes pour l'affichage).
-
-    Contenu du CSV final : selon la configuration et la plateforme, vous trouverez typiquement des colonnes telles que `timestamp`, `emissions` (kg), `emissions_rate`, `energy_consumed` (kWh), `cpu_power` / `gpu_power` / `ram_power` (W) et des métadonnées (OS, version Python, pays / zone, cloud, etc.). L'application lit ce CSV, calcule des agrégats (total, moyenne par run) et affiche une comparaison (ex. voiture) basée sur un facteur de ~120 g CO₂/km.
-
+                
+    **5. Résultats et limites**  
+    L'application agrège les totaux et propose des comparaisons. Les mesures courtes ou sans accès RAPL sont moins précises.
+    
+    ### Sources des équivalences
+    - **CodeCarbon**: [Documentation officielle](https://codecarbon.io/) | [GitHub](https://github.com/mlco2/codecarbon)
     """)
+
+st.markdown('<div style="text-align: center; padding: 2rem 0; color: #a0aec0; font-size: 0.9rem;">Carbon Footprint Analyzer • Par Lucie, Chloé et Antoine</div>', unsafe_allow_html=True)
