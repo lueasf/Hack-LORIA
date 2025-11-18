@@ -181,6 +181,10 @@ if st.button("Envoyer le prompt au modèle"):
         st.session_state.current_response = response
         st.session_state.last_tdev = tdev
 
+        # Indique quel modèle a produit cette réponse et marque la réponse comme "à sauvegarder"
+        st.session_state.response_model = st.session_state.selected_model
+        st.session_state.pending_save = True
+
 # Cette partie gère l'affichage de la réponse ou de l'erreur stockée en session
 if st.session_state.current_response:
     response_data = st.session_state.current_response
@@ -206,8 +210,11 @@ if st.session_state.current_response:
 if st.session_state.current_response:
     st.subheader("4. Empreinte carbone estimée")
 
+    # Utiliser explicitement le modèle qui a produit la réponse (s'il existe)
+    model_for_response = st.session_state.get("response_model", st.session_state.selected_model)
+
     carbon = compute_carbon(
-        st.session_state.selected_model,
+        model_for_response,
         st.session_state.current_prompt,
         st.session_state.current_response,
         st.session_state.last_tdev,
@@ -218,14 +225,19 @@ if st.session_state.current_response:
     # Affichage du temps de réponse
     st.metric(label="Temps de réponse (s)", value=f"{st.session_state.last_tdev:.3f}")
 
-    # Sauvegarde (inclut tdev)
-    save_session_entry(
-        st.session_state.current_prompt,
-        st.session_state.selected_model,
-        st.session_state.current_response,
-        carbon,
-        st.session_state.last_tdev,
-    )
+    # Sauvegarde uniquement si la réponse vient d'être récupérée et n'a pas encore été sauvegardée
+    if st.session_state.get("pending_save", False):
+        # protège contre l'enregistrement si l'utilisateur a changé de modèle entre-temps
+        if st.session_state.get("response_model") == model_for_response:
+            save_session_entry(
+                st.session_state.current_prompt,
+                model_for_response,
+                st.session_state.current_response,
+                carbon,
+                st.session_state.last_tdev,
+            )
+        # réinitialiser le marqueur pour éviter de resauvegarder lors des reruns
+        st.session_state.pending_save = False
 
 
 # -------------------------------------------------
