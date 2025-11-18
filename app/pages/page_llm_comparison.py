@@ -87,8 +87,6 @@ def new_prompt():
     st.session_state.current_response = ""
     st.session_state.selected_model = None
 
-
-
 def compute_carbon(model_name, prompt, response, tdev):
     """
     Stub pour calculer l'empreinte carbone.
@@ -225,18 +223,39 @@ if st.session_state.selected_model is None:
 st.subheader("3. Réponse du modèle")
 
 if st.button("Envoyer le prompt au modèle"):
-    start = time.time()
-    response = call_llm(st.session_state.selected_provider,
-        st.session_state.current_prompt,
-        model=st.session_state.selected_model,
-    )
-    tdev = time.time() - start
-    st.session_state.current_response = response
-    st.session_state.last_tdev = tdev
+    with st.spinner("Le modèle réfléchit..."):
+        start = time.time()
+        
+        response = call_llm(
+            st.session_state.selected_provider,
+            st.session_state.current_prompt,
+            model=st.session_state.selected_model,
+        )
+        
+        tdev = time.time() - start
+        
+        # On sauvegarde la réponse (qu'il s'agisse d'un succès ou d'une erreur)
+        st.session_state.current_response = response
+        st.session_state.last_tdev = tdev
 
+# Cette partie gère l'affichage de la réponse ou de l'erreur stockée en session
 if st.session_state.current_response:
-    st.write("### Réponse :")
-    st.write(st.session_state.current_response)
+    response_data = st.session_state.current_response
+
+    # Vérifie si la réponse est un dictionnaire et si elle contient une clé 'error'
+    if isinstance(response_data, dict) and 'error' in response_data:
+        st.error(f"**Une erreur est survenue lors de l'appel au modèle :**\n\n{response_data['error']}")
+    
+    # Sinon, si la réponse est bien une chaîne de caractères (cas du succès)
+    elif isinstance(response_data, str):
+        st.markdown("**Réponse du modèle :**")
+        # st.markdown(f"```\n{response_data}\n```")
+        st.markdown(response_data) # Affiche directement le markdown formaté
+        
+    # Cas de sécurité si la réponse n'est ni un dictionnaire d'erreur, ni une string
+    else:
+        st.warning("La réponse reçue est dans un format inattendu.")
+        st.write(response_data)
 
 
 # -------------------------------------------------
