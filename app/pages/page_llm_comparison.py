@@ -1,7 +1,22 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
 import streamlit as st
 import json
 import time
 from pathlib import Path
+from backend.config import MODELS_LIST
+from backend.llm_caller import call_llm
+
+# -----------------------------
+# CONFIGURATION DE LA PAGE
+# -----------------------------
+st.set_page_config(
+    page_title="LLM Comparison & Carbon Tracking",
+    page_icon="🤖",
+    layout="centered",
+)
 
 # -----------------------------
 # FICHIERS JSON
@@ -43,6 +58,9 @@ if "current_prompt" not in st.session_state:
 if "current_response" not in st.session_state:
     st.session_state.current_response = ""
 
+if "selected_provider" not in st.session_state:
+    st.session_state.selected_provider = None
+
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
 
@@ -69,14 +87,6 @@ def new_prompt():
     st.session_state.current_response = ""
     st.session_state.selected_model = None
 
-
-def call_llm_api(prompt, model_name):
-    """
-    Stub provisoire à remplacer par ton appel API :
-    """
-    # Ex : appeler Groq, OpenAI, ou autre
-    # return llm_api.call(prompt, model_name)
-    return f"[FAKE RESPONSE from {model_name}] for prompt: {prompt}"
 
 
 def compute_carbon(model_name, prompt, response, tdev):
@@ -178,20 +188,31 @@ if not st.session_state.prompt_validated:
 # -------------------------------------------------
 # 2. SÉLECTION DU MODÈLE
 # -------------------------------------------------
-st.subheader("2. Sélection du modèle LLM")
+st.subheader("2. Choix du provider et du modèle LLM")
 
-model_list = [
-    "groq/llama3-8b",
-    "groq/mixtral-8x7b",
-    "openai/gpt-4.1-mini",
-    "openai/gpt-3.5",
-]
+# Choix du provider
+st.session_state.selected_provider = st.selectbox(
+    "Choisissez un provider :", 
+    list(MODELS_LIST.keys()),
+    index=None,
+    placeholder="Sélectionnez un provider"
+)
+
+if st.session_state.selected_provider is None:
+    st.stop()
+
+provider = st.session_state.selected_provider
+models_for_provider = MODELS_LIST.get(provider, [])
+
+if not models_for_provider:
+    st.warning(f"Aucun modèle disponible pour le provider {provider}.")
+    st.stop()
 
 st.session_state.selected_model = st.selectbox(
-    "Choisissez un modèle :", 
-    model_list,
+    "Choisissez un modèle spécifique :", 
+    models_for_provider,
     index=None,
-    placeholder="Sélectionnez un modèle"
+    placeholder="Sélectionnez un modèle LLM"
 )
 
 if st.session_state.selected_model is None:
@@ -204,11 +225,10 @@ if st.session_state.selected_model is None:
 st.subheader("3. Réponse du modèle")
 
 if st.button("Envoyer le prompt au modèle"):
-    # Mesure du temps écoulé entre l'envoi et la réception (tdev)
     start = time.time()
-    response = call_llm_api(
+    response = call_llm(st.session_state.selected_provider,
         st.session_state.current_prompt,
-        st.session_state.selected_model,
+        model=st.session_state.selected_model,
     )
     tdev = time.time() - start
     st.session_state.current_response = response

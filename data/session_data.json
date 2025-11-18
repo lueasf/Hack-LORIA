@@ -10,5 +10,17 @@
     "model": "groq/llama3-8b",
     "response": "[FAKE RESPONSE from groq/llama3-8b] for prompt: bonjour",
     "carbon": 0.123
+  },
+  {
+    "prompt": "Ecris-moi un po\u00e8me sur le Soleil.",
+    "model": "gpt-3.5-turbo",
+    "response": "Soleil radieux, astre divin,\nToi qui illumines nos matins,\nTa lumi\u00e8re dor\u00e9e nous r\u00e9chauffe le c\u0153ur,\nEt chasse les t\u00e9n\u00e8bres avec ardeur.\n\nTon \u00e9clat \u00e9blouissant inonde la terre,\nEt fait briller chaque fleur, chaque pierre,\nTu r\u00e9veilles la nature de son sommeil,\nEt lui insuffles une \u00e9nergie sans pareil.\n\nDans le ciel bleu, tu danses avec gr\u00e2ce,\nEt nous ravies de ta chaleur qui nous embrasse,\nTa pr\u00e9sence bienveillante nous r\u00e9conforte,\nEt nous rappelle que la vie est une porte.\n\nSoleil, source de vie et de lumi\u00e8re,\nTu es le symbole de la force et de la fiert\u00e9,\nNous te saluons avec respect et humilit\u00e9,\nEt te remercions pour ta g\u00e9n\u00e9rosit\u00e9.",
+    "carbon": 0.123
+  },
+  {
+    "prompt": "merci beaucoup",
+    "model": "gpt-3.5-turbo",
+    "response": "De rien, c'est un plaisir d'aider! N'h\u00e9sitez pas si vous avez d'autres questions.",
+    "carbon": 0.123
   }
 ]
