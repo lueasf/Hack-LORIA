@@ -101,7 +101,7 @@ def save_session_entry(prompt, model_name, response, carbon, tdev_seconds):
 # -----------------------------
 # PAGE FRONT
 # -----------------------------
-st.title("📄 Session LLM — Évaluation de l'empreinte carbone")
+st.title("📄 Session LLM - Évaluation de l'empreinte carbone")
 
 st.write("Cette page vous permet d’envoyer un prompt à plusieurs modèles LLM, "
          "d’enregistrer chaque résultat, et de suivre l’empreinte carbone associée.")
@@ -257,7 +257,46 @@ if st.session_state.current_response:
         afficher_details()
 
 # -------------------------------------------------
-# 5. Visualisation de session (placeholder)
+# 5. Visualisation de session
 # -------------------------------------------------
-st.subheader("5. Visualisation de la session (à venir)")
-st.info("La partie visualisation sera ajoutée plus tard (graphiques, stats, etc.).")
+st.subheader("5. Visualisation comparative des modèles")
+
+# Import du module de visualisation
+from backend.visualisation import create_model_comparison_chart, create_session_timeline
+
+# Créer et afficher le graphique comparatif
+fig_comparison = create_model_comparison_chart()
+st.plotly_chart(fig_comparison, use_container_width=True)
+
+# Afficher également la timeline (optionnel)
+with st.expander("📊 Voir la chronologie de la session"):
+    fig_timeline = create_session_timeline()
+    st.plotly_chart(fig_timeline, use_container_width=True)
+
+# Statistiques globales
+from backend.utils import load_json
+session_data = load_json(SESSION_FILE)
+
+if session_data:
+    total_calls = len(session_data)
+    total_carbon = sum(entry['carbon'] for entry in session_data)
+    avg_carbon = total_carbon / total_calls
+    avg_time = sum(entry['tdev_seconds'] for entry in session_data) / total_calls
+    
+    st.markdown("---")
+    st.markdown("### 6. Statistiques de la session")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Appels totaux", total_calls)
+    
+    with col2:
+        st.metric("Émissions totales", f"{total_carbon:.4f} gCO₂e")
+    
+    with col3:
+        st.metric("Moyenne par appel", f"{avg_carbon:.4f} gCO₂e")
+    
+    with col4:
+        st.metric("Temps moyen", f"{avg_time:.3f} s")
+

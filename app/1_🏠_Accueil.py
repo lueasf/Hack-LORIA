@@ -43,8 +43,36 @@ if os.path.exists(img_path):
     </style>
     """, unsafe_allow_html=True)
 
-# Centrer le titre
-st.markdown("<h1 style='text-align: center;'>Bienvenue sur TelecomCarbon ! 🌿</h1>", unsafe_allow_html=True)
+# Barre de navigation en haut
+st.markdown("""
+<div style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 999998;
+">
+    <div style="margin-left: 2rem; font-size: 1.5rem; font-weight: 700; color: #000000; font-family: 'Righteous', sans-serif;">
+        TelecomCarbon 🌿
+    </div>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+        <a href="#contact" style="color: #000000; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Contact</a>
+        <a href="#about" style="color: #000000; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">À propos</a>
+        <a href="#links" style="color: #000000; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Liens utiles</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Centrer le titre avec marge négative pour compenser la navbar
+st.markdown("<div style='margin-top: -1rem;'><h1 style='text-align: center;'>Mesurez. Comprenez. Réduisez.</h1></div>", unsafe_allow_html=True)
 
 # st.markdown("Choississez une application ci-dessous.")
 
@@ -142,7 +170,7 @@ st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
 
 # Ajouter un footer beige
 st.markdown("""
-<div class="custom-footer">
+<div class="custom-footer" id="contact">
     <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap;">
         <div style="margin: 1rem;">
             <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">Contact</h3>
@@ -150,12 +178,12 @@ st.markdown("""
             <p style="color: #333333; margin: 0.5rem 0;"><a href="mailto:chloe.wiatt@telecomnancy.eu" style="color: #333333; text-decoration: none;">chloe.wiatt@telecomnancy.eu</a></p>
             <p style="color: #333333; margin: 0.5rem 0;"><a href="mailto:lucie.correia@telecomnancy.eu" style="color: #333333; text-decoration: none;">lucie.correia@telecomnancy.eu</a></p>
             </div>
-        <div style="margin: 1rem;">
+        <div style="margin: 1rem;" id="about">
             <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">À propos</h3>
             <p style="color: #333333; margin: 0.5rem 0;"><a href="https://telecomnancy.univ-lorraine.fr/" target="_blank" style="color: #333333; text-decoration: none;"><u>Telecom Nancy</u></a></p>
             <p style="color: #333333; margin: 0.5rem 0;"><a href="https://www.loria.fr/fr/" target="_blank" style="color: #333333; text-decoration: none;"><u>LORIA</u></a></p>
         </div>
-        <div style="margin: 1rem;">
+        <div style="margin: 1rem;" id="links">
             <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">Liens utiles</h3>
             <p style="color: #333333; margin: 0.5rem 0;"><a href="https://codecarbon.io/" target="_blank" style="color: #333333; text-decoration: none;"><u>CodeCarbon Documentation</u></a></p>
             <p style="color: #333333; margin: 0.5rem 0;"><a href="https://arxiv.org/pdf/2309.14393" target="_blank" style="color: #333333; text-decoration: none;"><u>LLMCarbon Paper</u></a></p>
