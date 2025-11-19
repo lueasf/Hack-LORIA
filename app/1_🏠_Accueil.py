@@ -40,12 +40,13 @@ if os.path.exists(img_path):
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Bienvenue sur TelecomCarbon ! 🌿")
+# Centrer le titre
+st.markdown("<h1 style='text-align: center;'>Bienvenue sur TelecomCarbon ! 🌿</h1>", unsafe_allow_html=True)
 
 # st.markdown("Choississez une application ci-dessous.")
 
-# Créer des colonnes pour les boutons
-col1, col2 = st.columns(2)
+# Créer des colonnes pour centrer les boutons
+col_spacer1, col1, col2, col_spacer2 = st.columns([1, 2, 2, 1])
 
 with col1:
     st.subheader("🍃 PromptCarbon")
@@ -60,8 +61,33 @@ with col2:
     if st.button("Lancer le calculateur"):
         st.switch_page("pages/2_🌍_CodeCarbon.py")
 
-# La barre latérale affichera également la navigation
+# Ajouter une citation centrée dans un encadré transparent
+st.markdown("""
+<div style="
+    background: rgba(255, 255, 255, 0.25);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 10rem auto;
+    max-width: 800px;
+">
+    <p style="font-size: 1.2rem; font-style: italic; color: #000000; margin: 0;">
+        "L'intelligence artificielle est la nouvelle électricité, mais comme toute source d'énergie, 
+        elle a un coût environnemental qu'il nous appartient de mesurer et de réduire."
+    </p>
+    <p style="color: #666666; margin-top: 1rem; font-size: 0.9rem;">
+        — Notre engagement pour un numérique responsable
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 st.sidebar.success("Sélectionnez une page ci-dessus.")
+
+# Ajouter un espacement pour permettre le scroll avant le graphique
+st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
 
 # Ajouter un graphique interactif Plotly
 st.markdown("---")
@@ -100,7 +126,7 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 # Ajouter un espacement pour permettre le scroll
-st.markdown("<div style='height: 50vh;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
 
 # Ajouter un footer beige
 st.markdown("""
