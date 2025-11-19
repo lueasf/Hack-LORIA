@@ -123,27 +123,5 @@ def show_calculation():
 
     st.divider()
 
-    # --- 4. Contextualisation "Fun" ---
-    st.subheader("Comparaisons")
-    
-    # Petite comparaison avec une ampoule LED (approx 10W => 0.01 kW)
-    # Si on prend le mix monde ~0.475 kg/kwh. 
-    # 1h d'ampoule = 0.01 * 0.475 = 0.00475 kg = 4.75g.
-    # Donc 1g ~ 12 minutes d'ampoule LED.
-    
-    minutes_led = (total_carbon_g / 4.75) * 60 
-    seconds_led = minutes_led * 60
-    
-    time_str = f"{seconds_led:.1f} secondes"
-
-    col_icon, col_text = st.columns([1, 8])
-    with col_icon:
-        st.markdown("# 💡")
-    with col_text:
-        st.markdown(f"""
-        Cette requête équivaut environ à laisser une **ampoule LED allumée pendant {time_str}**.
-        *(Basé sur une ampoule LED standard de 10W)*
-        """)
-
 if __name__ == "__main__":
     show_calculation()
