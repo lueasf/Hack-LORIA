@@ -34,7 +34,7 @@ def show_calculation():
     
     # Données d'exécution
     tdev = st.session_state.get("last_tdev", 0.73) # Valeur par défaut pour l'exemple
-    region_used = "us" # Fixe selon ton code actuel
+    region_used = profile.get("country", "default")
     
     # --- 2. Pré-calculs pour l'affichage ---
     device_count = int(profile.get("device_count", 1))
@@ -49,7 +49,7 @@ def show_calculation():
     tdev_hours = tdev_seconds / 3600.0
     
     # Facteurs carbones
-    ci_val = CARBON_INTENSITY.get(region_used, 0.4) # kgCO2e/kWh
+    ci_val = CARBON_INTENSITY.get(region_used, CARBON_INTENSITY[region_used]) # kgCO2e/kWh
     
     # A. Calcul Opérationnel (Énergie)
     # Formule : Puissance * PUE * Intensité Carbone * Temps
