@@ -115,8 +115,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.success("Sélectionnez une page ci-dessus.")
-
 # Ajouter un espacement pour permettre le scroll avant le graphique
 st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
 

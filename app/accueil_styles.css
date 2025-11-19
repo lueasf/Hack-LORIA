@@ -128,7 +128,7 @@ section[data-testid="stSidebar"] {
 }
 
 /* Texte de la sidebar en noir */
-[data-testid="stSidebar"] * {
+[data-testid="stSidebar"] *:not(.material-symbols-rounded):not(.material-icons):not([data-testid="stIconMaterial"]) {
     color: #000000 !important;
     font-family: 'Righteous', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
@@ -151,9 +151,9 @@ section[data-testid="stSidebar"] {
 }
 
 /* Police moderne et texte noir pour tout le contenu */
-* {
+*:not(.material-symbols-rounded):not(.material-icons):not([data-testid="stIconMaterial"]) {
     font-family: 'Righteous', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-}
+} 
 
 h1, h2, h3, h4, h5, h6 {
     color: #000000 !important;
