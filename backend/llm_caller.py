@@ -3,6 +3,8 @@ from google import genai
 from groq import Groq, APIError as GroqAPIError
 from .config import API_KEYS, MODELS_LIST
 
+import requests
+
 def call_openai(api_key, prompt, model):
     try:
         client = OpenAI(api_key=api_key)
@@ -79,7 +81,37 @@ def call_groq(api_key, prompt, model):
         error_message = f"Une erreur inattendue est survenue avec Groq : {e}"
         print(error_message)
         return {"error": error_message}
+    
 
+
+HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
+
+def call_HF(api_key: str, prompt: str, model: str):
+    """
+    Envoie un message utilisateur vers n'importe quel modèle HF compatible Chat-Completions.
+    Retourne le contenu de la réponse.
+    """
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    response = requests.post(HF_API_URL, headers=headers, json=payload)
+
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"❌ Erreur HF {response.status_code} — {response.text}"
+        )
+
+    data = response.json()
+    
+    return data["choices"][0]["message"]["content"]
 
 def call_llm(provider, prompt, model=None):
     provider = provider.lower()
@@ -107,6 +139,12 @@ def call_llm(provider, prompt, model=None):
             kwargs["model"] = model
             kwargs["api_key"] = api_key
             return call_groq(**kwargs)
+        elif provider == "hf":
+            api_key = API_KEYS["hf"]
+            model = model if model else MODELS_LIST["hf"][0]
+            kwargs["model"] = model
+            kwargs["api_key"] = api_key
+            return call_HF(**kwargs)
         else:
             raise ValueError(f"Provider {provider} not supported.")
     except KeyError as e:
