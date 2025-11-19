@@ -3,6 +3,9 @@ import streamlit as st
 import base64
 import os
 import plotly.graph_objects as go
+import sys
+sys.path.append('/home/lue/code/github/Hack-LORIA')
+from backend.map import create_carbon_intensity_map
 
 st.set_page_config(
     page_title="Accueil",
@@ -124,6 +127,15 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+# Ajouter un espacement
+st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
+
+# Ajouter la carte du mix énergétique
+st.markdown("### Mix Énergétique Mondial")
+
+fig_map = create_carbon_intensity_map()
+st.plotly_chart(fig_map, use_container_width=True)
 
 # Ajouter un espacement pour permettre le scroll
 st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
