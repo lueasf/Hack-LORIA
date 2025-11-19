@@ -4,7 +4,7 @@ import base64
 import os
 import plotly.graph_objects as go
 import sys
-sys.path.append('/home/lue/code/github/Hack-LORIA')
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.map import create_carbon_intensity_map
 
 st.set_page_config(
