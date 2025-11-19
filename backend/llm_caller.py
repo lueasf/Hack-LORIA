@@ -4,49 +4,56 @@ from groq import Groq, APIError as GroqAPIError
 from .config import API_KEYS, MODELS_LIST
 
 import requests
+import time
 
 def call_openai(api_key, prompt, model):
     try:
         client = OpenAI(api_key=api_key)
+        start = time.time()
         response = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.choices[0].message.content
+        tdev = time.time() - start
+        return response.choices[0].message.content, tdev
     except APIError as e:
         # Gère toutes les erreurs venant de l'API OpenAI (authentification, rate limit, etc.)
         error_message = f"Erreur de l'API OpenAI : {e.status_code} - {e.message}"
         print(error_message)
-        return {"error": error_message}
+        return {"error": error_message}, 0
     except Exception as e:
         # Gère les autres erreurs (ex: problème de connexion)
         error_message = f"Une erreur inattendue est survenue avec OpenAI : {e}"
         print(error_message)
-        return {"error": error_message}
+        return {"error": error_message}, 0
 
 def call_gemini(api_key, prompt, model):
     try:
         client = genai.Client(api_key=api_key)
+        start = time.time()
         response = client.models.generate_content(
             model=model,
             contents=prompt
             )
-        return response.text
+        tdev = time.time() - start
+        return response.text, tdev
     except Exception as e:
         # La bibliothèque de Google peut lever des exceptions variées,
         # notamment pour des problèmes de permission (403), de ressource non trouvée (404) ou de surcharge (503).
         error_message = f"Une erreur est survenue avec l'API Gemini : {e}"
         print(error_message)
-        return {"error": error_message}
+        return {"error": error_message}, 0
 
 def call_groq(api_key, prompt, model):
     try:
         client = Groq(api_key=api_key)
+        start = time.time()
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
             model=model,
         )
-        return response.choices[0].message.content
+        tdev = time.time() - start
+        return response.choices[0].message.content, tdev
     except GroqAPIError as e:
         error_details = "Détails non disponibles"
         
@@ -74,13 +81,13 @@ def call_groq(api_key, prompt, model):
         print(full_error_message)
         
         # On retourne un message simple et propre pour le front-end
-        return {"error": f"Une erreur est survenue avec l'API Groq (code {e.status_code}). Veuillez réessayer plus tard."}
+        return {"error": f"Une erreur est survenue avec l'API Groq (code {e.status_code}). Veuillez réessayer plus tard."}, 0
         
     except Exception as e:
         # Gère les autres erreurs (ex: problème de connexion)
         error_message = f"Une erreur inattendue est survenue avec Groq : {e}"
         print(error_message)
-        return {"error": error_message}
+        return {"error": error_message}, 0
     
 
 
@@ -88,30 +95,76 @@ HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 
 def call_HF(api_key: str, prompt: str, model: str):
     """
-    Envoie un message utilisateur vers n'importe quel modèle HF compatible Chat-Completions.
-    Retourne le contenu de la réponse.
+    Envoie un message utilisateur vers l'API Inference de Hugging Face.
+    Gère les erreurs réseaux, les erreurs d'API (4xx, 5xx) et le chargement des modèles.
     """
     headers = {
         "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
     }
 
     payload = {
         "model": model,
         "messages": [
             {"role": "user", "content": prompt}
-        ]
+        ],
+        "stream": False # On force le non-streaming pour simplifier la réponse
     }
 
-    response = requests.post(HF_API_URL, headers=headers, json=payload)
+    try:
+        start = time.time()
+        # On ajoute un timeout pour éviter que le script ne pende indéfiniment
+        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=30)
+        
+        # Gestion des codes d'erreur HTTP (4xx, 5xx)
+        if response.status_code != 200:
+            error_details = response.text
+            
+            # Tentative d'extraction propre du message d'erreur JSON renvoyé par HF
+            try:
+                error_json = response.json()
+                # HF renvoie souvent {'error': 'Model is loading...'} ou {'error': ['msg...']}
+                if isinstance(error_json, dict) and 'error' in error_json:
+                    error_details = error_json['error']
+            except ValueError:
+                # Si ce n'est pas du JSON (ex: page HTML d'erreur 502 Bad Gateway)
+                pass
 
-    if response.status_code != 200:
-        raise RuntimeError(
-            f"❌ Erreur HF {response.status_code} — {response.text}"
-        )
+            # Gestion spécifique : Modèle en cours de chargement (Erreur 503 fréquente sur HF)
+            if response.status_code == 503 and "loading" in str(error_details).lower():
+                print(f"Info HF : Le modèle {model} est en cours de chargement (Cold Boot).")
+                return {"error": "Le modèle est en cours de chargement sur les serveurs Hugging Face. Veuillez réessayer dans 20-30 secondes."}, 0
+            
+            error_message = f"Erreur de l'API HF : {response.status_code} - {error_details}"
+            print(error_message)
+            return {"error": f"Une erreur est survenue avec Hugging Face (code {response.status_code})."}, 0
 
-    data = response.json()
-    
-    return data["choices"][0]["message"]["content"]
+        # Succès
+        data = response.json()
+        tdev = time.time() - start
+        
+        # Vérification que la structure de réponse est celle attendue
+        if "choices" in data and len(data["choices"]) > 0:
+            return data["choices"][0]["message"]["content"], tdev
+        else:
+            print(f"Format de réponse inattendu de HF : {data}")
+            return {"error": "Format de réponse inattendu de l'API Hugging Face."}, 0
+
+    except requests.exceptions.Timeout:
+        error_message = "Erreur : La requête vers Hugging Face a expiré (Timeout)."
+        print(error_message)
+        return {"error": error_message}, 0
+
+    except requests.exceptions.ConnectionError:
+        error_message = "Erreur : Impossible de se connecter aux serveurs Hugging Face (Problème réseau)."
+        print(error_message)
+        return {"error": error_message}, 0
+
+    except Exception as e:
+        # Capture toute autre erreur imprévue (parsing, etc.)
+        error_message = f"Une erreur inattendue est survenue avec HF : {e}"
+        print(error_message)
+        return {"error": error_message}, 0
 
 def call_llm(provider, prompt, model=None):
     provider = provider.lower()

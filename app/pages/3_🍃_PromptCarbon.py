@@ -3,7 +3,6 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 import streamlit as st
-import time
 from pathlib import Path
 from backend.config import MODELS_LIST
 from backend.llm_caller import call_llm
@@ -169,15 +168,12 @@ st.subheader("3. Réponse du modèle")
 
 if st.button("Envoyer le prompt au modèle"):
     with st.spinner("Le modèle réfléchit..."):
-        start = time.time()
         
-        response = call_llm(
+        response, tdev = call_llm(
             st.session_state.selected_provider,
             st.session_state.current_prompt,
             model=st.session_state.selected_model,
         )
-        
-        tdev = time.time() - start
         
         # On sauvegarde la réponse (qu'il s'agisse d'un succès ou d'une erreur)
         st.session_state.current_response = response
