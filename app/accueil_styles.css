@@ -166,3 +166,51 @@ p, div, span, label {
     transform: translateY(-3px) !important;
     text-decoration: underline !important;
 }
+
+/* --- AJOUTS POUR MAIN.PY --- */
+
+/* 1. Cacher les éléments système Streamlit */
+.stAppDeployButton { display: none; }
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+header { visibility: hidden; } 
+
+/* 2. Style de la barre de navigation (Navbar) */
+/* Ajustement du Logo/Titre pour l'aligner avec les boutons */
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e2e8f0; 
+    margin: 0;
+    padding: 0;
+    line-height: 1.2; 
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Style des boutons de lien (inactifs) */
+div[data-testid="stPageLink-NavLink"] {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+    justify-content: center; /* Centre le texte dans le bouton */
+}
+
+/* Survol des boutons */
+div[data-testid="stPageLink-NavLink"]:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+/* Bouton Actif (Page courante) */
+div[data-testid="stPageLink-NavLink"][aria-current="page"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
+}
