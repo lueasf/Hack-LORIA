@@ -56,9 +56,11 @@ if "last_tdev" not in st.session_state:
     # dernier temps de développement (s) mesuré entre envoi et réception
     st.session_state.last_tdev = 0.0
 
-save_json(PROMPTS_FILE, [])
-save_json(SESSION_FILE, [])
+def load_css(file_path):
+    with open(file_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
 
 # -----------------------------
 # CALLBACKS

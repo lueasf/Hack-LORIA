@@ -90,7 +90,7 @@ with col2:
     st.subheader("🌍 CodeCarbon")
     st.write("Mesurez l'empreinte carbone de vos scripts.")
     if st.button("Lancer le calculateur"):
-        st.switch_page("pages/2_🌍_CodeCarbon.py")
+        st.switch_page("pages/2_⚙️_CodeCarbon.py")
 
 # Ajouter une citation centrée dans un encadré transparent
 st.markdown("""

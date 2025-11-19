@@ -1,230 +1,577 @@
-/* Masquer les éléments Streamlit par défaut SAUF le bouton sidebar */
+/* ============================================
+   CONFIGURATION GÉNÉRALE
+   ============================================ */
+
+/* Variables CSS pour une gestion cohérente des couleurs */
+:root {
+    --color-primary: #7fb069;
+    --color-secondary: #d4a762;
+    --color-accent: #4ecdc4;
+    --color-dark: #2c3e2f;
+    --color-light: #f7f9f5;
+    --color-text: #1a1a1a;
+    --color-overlay: rgba(127, 176, 105, 0.1);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-strong: 0 12px 48px rgba(0, 0, 0, 0.15);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Masquer les éléments Streamlit par défaut */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: visible !important;}
 
-/* Fond et couleurs */
-.stApp {
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1d3a 100%);
+/* ============================================
+   TEXTE GLOBAL - TOUT EN NOIR
+   ============================================ */
+
+/* Tous les paragraphes et textes */
+p, span, div, label, li, td, th {
+    color: var(--color-text) !important;
 }
 
-/* Container principal */
+/* Labels spécifiques Streamlit */
+.stMarkdown, .stText {
+    color: var(--color-text) !important;
+}
+
+/* Labels des inputs */
+label, .stTextInput label, .stTextArea label, .stNumberInput label, 
+.stSelectbox label, .stMultiSelect label, .stSlider label,
+.stRadio label, .stCheckbox label {
+    color: var(--color-text) !important;
+}
+
+/* Texte dans la sidebar */
+[data-testid="stSidebar"] p, 
+[data-testid="stSidebar"] span, 
+[data-testid="stSidebar"] div, 
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] li {
+    color: var(--color-text) !important;
+}
+
+/* Texte des markdown */
+.stMarkdown p, .stMarkdown span, .stMarkdown div {
+    color: var(--color-text) !important;
+}
+
+/* Fond moderne avec dégradé subtil */
+.stApp {
+    background: linear-gradient(135deg, #f7f9f5 0%, #e8f3e1 50%, #dcedc8 100%);
+    background-attachment: fixed;
+}
+
+/* Container principal avec espacement généreux */
 .main .block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
     max-width: 1400px;
 }
 
-/* Titre principal */
+/* Titre principal moderne avec effet gradient */
 h1 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 700;
-    font-size: 2.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    background: linear-gradient(135deg, #7fb069 0%, #4ecdc4 50%, #d4a762 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
-/* Sous-titre */
+/* Sous-titre épuré */
 .subtitle {
-    color: #a0aec0;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    font-weight: 300;
+    color: var(--color-text) !important;
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
 }
 
-/* Cards avec effet glassmorphism */
+
+/* ============================================
+   CARDS & CONTAINERS
+   ============================================ */
+
+/* Cards modernes avec effet glassmorphism raffiné */
 .metric-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1px solid rgba(127, 176, 105, 0.2);
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 1.5rem;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Sidebar styling */
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: var(--transition-smooth);
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(127, 176, 105, 0.4);
+    box-shadow: var(--shadow-strong);
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+/* Sidebar moderne avec fond clair */
 [data-testid="stSidebar"] {
-    background: rgba(26, 29, 58, 0.95);
-    backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(232, 243, 225, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(127, 176, 105, 0.2);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06);
 }
 
 [data-testid="stSidebar"] h2 {
-    color: #667eea;
-    font-size: 1.3rem;
-    font-weight: 600;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    color: var(--color-text) !important;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--color-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
 }
 
-/* Input fields */
+/* Titres h3 dans sidebar */
+[data-testid="stSidebar"] h3 {
+    color: var(--color-text) !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+
+
+/* ============================================
+   INPUT FIELDS
+   ============================================ */
+
+/* Champs de saisie modernes */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea,
 .stNumberInput > div > div > input {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #e2e8f0;
-    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(127, 176, 105, 0.3);
+    border-radius: 16px;
+    color: var(--color-dark);
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+
+.stTextInput > div > div > input::placeholder,
+.stTextArea > div > div > textarea::placeholder,
+.stNumberInput > div > div > input::placeholder {
+    color: rgba(44, 62, 47, 0.5);
 }
 
 .stTextInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus,
 .stNumberInput > div > div > input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 1px #667eea;
+    border-color: var(--color-primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(127, 176, 105, 0.1),
+                var(--shadow-soft);
+    transform: translateY(-2px);
+    outline: none;
 }
 
-/* Boutons */
+
+
+/* ============================================
+   BOUTONS
+   ============================================ */
+
+/* Boutons principaux avec effet moderne */
 .stButton > button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, #6ba055 100%);
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 0.75rem 2rem;
+    border-radius: 16px;
+    padding: 1rem 2.5rem;
     font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-medium);
+    background: linear-gradient(135deg, #6ba055 0%, var(--color-primary) 100%);
 }
 
-/* Download button */
+.stButton > button:hover::before {
+    left: 100%;
+}
+
+.stButton > button:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Bouton de téléchargement */
 .stDownloadButton > button {
-    background: rgba(72, 187, 120, 0.2);
-    color: #48bb78;
-    border: 1px solid #48bb78;
-    border-radius: 8px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 16px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
 }
 
 .stDownloadButton > button:hover {
-    background: rgba(72, 187, 120, 0.3);
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
 }
 
-/* Metrics */
+
+
+/* ============================================
+   METRICS & DONNÉES
+   ============================================ */
+
+/* Valeurs métriques */
 [data-testid="stMetricValue"] {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #667eea;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
 }
 
 [data-testid="stMetricLabel"] {
-    color: #a0aec0;
-    font-size: 0.9rem;
+    color: #6b8260;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    font-weight: 600;
 }
 
-/* Expanders */
+
+
+/* ============================================
+   EXPANDERS & SECTIONS EXTENSIBLES
+   ============================================ */
+
+/* Headers des expanders */
 .streamlit-expanderHeader {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-    font-weight: 500;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    border: 2px solid rgba(127, 176, 105, 0.2);
+    color: var(--color-text) !important;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    transition: var(--transition-smooth);
 }
 
 .streamlit-expanderHeader:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--color-primary);
+    transform: translateX(6px);
+    box-shadow: var(--shadow-soft);
 }
 
-/* Code blocks */
+/* Contenu des expanders */
+.streamlit-expanderContent {
+    color: var(--color-text) !important;
+}
+
+.streamlit-expanderContent p, 
+.streamlit-expanderContent span,
+.streamlit-expanderContent div {
+    color: var(--color-text) !important;
+}
+
+
+
+/* ============================================
+   CODE & TABLES
+   ============================================ */
+
+/* Blocs de code */
 .stCodeBlock {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(44, 62, 47, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(127, 176, 105, 0.2);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Tables */
 .stTable {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
 }
 
-/* Alerts */
+
+
+/* ============================================
+   ALERTS & NOTIFICATIONS
+   ============================================ */
+
+/* Alertes */
 .stAlert {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border-left: 4px solid;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    border-left: 4px solid var(--color-primary);
+    box-shadow: var(--shadow-soft);
 }
 
-/* Success/Info/Warning/Error colors */
+/* Notifications */
 [data-baseweb="notification"] {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(127, 176, 105, 0.2);
+    box-shadow: var(--shadow-soft);
 }
+
+
+
+/* ============================================
+   SELECT BOX & FILE UPLOADER
+   ============================================ */
 
 /* Select box */
 .stSelectbox > div > div {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    border: 2px solid rgba(127, 176, 105, 0.3);
+    transition: var(--transition-smooth);
+}
+
+.stSelectbox > div > div:hover {
+    border-color: var(--color-primary);
+    background: white;
+    box-shadow: var(--shadow-soft);
 }
 
 /* File uploader */
 [data-testid="stFileUploader"] {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    padding: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    border: 2px dashed rgba(127, 176, 105, 0.4);
+    padding: 2rem;
+    transition: var(--transition-smooth);
 }
 
-/* Divider */
+[data-testid="stFileUploader"]:hover {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.9);
+    border-style: solid;
+}
+
+
+
+/* ============================================
+   DIVIDERS & HEADERS
+   ============================================ */
+
+/* Séparateurs */
 hr {
-    border-color: rgba(255, 255, 255, 0.1);
-    margin: 2rem 0;
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+    margin: 3rem 0;
+    opacity: 0.3;
 }
 
-/* Section headers */
+/* Titres de section */
 h3 {
-    color: #e2e8f0;
+    color: var(--color-text) !important;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+h4 {
+    color: var(--color-text) !important;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     margin-top: 2rem;
     margin-bottom: 1rem;
 }
 
-h4 {
-    color: #cbd5e0;
-    font-weight: 500;
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
+h5, h6 {
+    color: var(--color-text) !important;
 }
 
-/* Comparison items */
+
+
+/* ============================================
+   COMPARISON ITEMS
+   ============================================ */
+
+/* Éléments de comparaison */
 .comparison-item {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 0.5rem 0;
-    border-left: 3px solid #667eea;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin: 1rem 0;
+    border: 2px solid rgba(127, 176, 105, 0.2);
+    border-left: 5px solid var(--color-primary);
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+    color: var(--color-text) !important;
 }
 
-/* Show sidebar toggle button */
+.comparison-item p, 
+.comparison-item span,
+.comparison-item div {
+    color: var(--color-text) !important;
+}
+
+.comparison-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(127, 176, 105, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.comparison-item:hover {
+    background: white;
+    border-color: var(--color-primary);
+    transform: translateX(10px);
+    box-shadow: -6px 0 24px rgba(127, 176, 105, 0.2);
+}
+
+.comparison-item:hover::after {
+    left: 100%;
+}
+
+
+
+/* ============================================
+   SIDEBAR TOGGLE BUTTON
+   ============================================ */
+
+/* Bouton toggle de la sidebar */
 button[kind="header"] {
     display: block !important;
-    background: rgba(102, 126, 234, 0.2) !important;
-    color: white !important;
-    border: 1px solid rgba(102, 126, 234, 0.3) !important;
-    border-radius: 8px !important;
-    padding: 0.5rem 1rem !important;
-    transition: all 0.3s ease !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: var(--color-primary) !important;
+    border: 2px solid rgba(127, 176, 105, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 0.75rem 1.25rem !important;
+    transition: var(--transition-smooth) !important;
+    font-weight: 600 !important;
 }
 
 button[kind="header"]:hover {
-    background: rgba(102, 126, 234, 0.3) !important;
-    border-color: rgba(102, 126, 234, 0.5) !important;
+    background: var(--color-primary) !important;
+    color: white !important;
+    border-color: var(--color-primary) !important;
     transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-soft) !important;
+}
+
+/* ============================================
+   SCROLLBAR MODERNE
+   ============================================ */
+
+/* Personnalisation de la scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(127, 176, 105, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--color-primary), #6ba055);
+    border-radius: 10px;
+    border: 2px solid rgba(247, 249, 245, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #6ba055, var(--color-primary));
+}
+
+/* ============================================
+   ANIMATIONS GLOBALES
+   ============================================ */
+
+/* Animation d'apparition */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation de pulsation subtile */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Appliquer l'animation aux éléments principaux */
+.main .block-container > div {
+    animation: fadeInUp 0.6s ease-out;
 }
