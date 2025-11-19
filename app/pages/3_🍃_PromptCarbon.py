@@ -56,6 +56,9 @@ if "last_tdev" not in st.session_state:
     # dernier temps de développement (s) mesuré entre envoi et réception
     st.session_state.last_tdev = 0.0
 
+save_json(PROMPTS_FILE, [])
+save_json(SESSION_FILE, [])
+
 
 # -----------------------------
 # CALLBACKS
@@ -74,6 +77,13 @@ def new_prompt():
     st.session_state.current_prompt = ""
     st.session_state.current_response = ""
     st.session_state.selected_model = None
+
+    try:
+        save_json(PROMPTS_FILE, [])
+        save_json(SESSION_FILE, [])
+        st.info("Historique des prompts et de la session vidé.")
+    except Exception as e:
+        st.error(f"Impossible de vider le fichier des prompts : {e}")
 
 def save_session_entry(prompt, model_name, response, carbon, tdev_seconds):
     """Enregistre une entrée de session incluant le temps de réponse (tdev en secondes)."""
