@@ -2,9 +2,10 @@
 import streamlit as st
 import base64
 import os
+import plotly.graph_objects as go
 
 st.set_page_config(
-    page_title="Accueil de l'application",
+    page_title="Accueil",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -15,70 +16,19 @@ def get_base64_image(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # Charger l'image de fond
-img_path = "app/assets/fond.png"
+img_path = "app/assets/fond6.png"
 if os.path.exists(img_path):
     img_base64 = get_base64_image(img_path)
+    
+    # Charger le CSS externe
+    css_path = "app/accueil_styles.css"
+    with open(css_path) as f:
+        css_content = f.read()
     
     # Appliquer le CSS avec l'image de fond
     st.markdown(f"""
     <style>
-        /* Import modern fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        /* Masquer le header Streamlit (menu, deploy, etc.) mais garder le bouton sidebar */
-        #MainMenu {{visibility: hidden;}}
-        header {{
-            visibility: visible !important;
-            background: transparent !important;
-            background-color: transparent !important;
-        }}
-        
-        /* Rendre le header toolbar transparent */
-        [data-testid="stHeader"] {{
-            background: transparent !important;
-            background-color: transparent !important;
-        }}
-        
-        footer {{visibility: hidden;}}
-        
-        /* Forcer le bouton collapse sidebar à toujours être visible */
-        [data-testid="collapsedControl"] {{
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            position: fixed !important;
-            left: 0.5rem !important;
-            top: 0.5rem !important;
-            z-index: 999999 !important;
-            background: rgba(255, 255, 255, 0.25) !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            border-radius: 8px !important;
-            padding: 0.5rem !important;
-            backdrop-filter: blur(10px) !important;
-        }}
-        
-        [data-testid="collapsedControl"]:hover {{
-            background: rgba(255, 255, 255, 0.4) !important;
-            transform: translateY(-2px) !important;
-        }}
-        
-        /* Styliser le bouton toggle de la sidebar */
-        button[kind="header"] {{
-            display: block !important;
-            visibility: visible !important;
-            background: rgba(255, 255, 255, 0.25) !important;
-            color: #000000 !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            border-radius: 8px !important;
-            padding: 0.5rem 1rem !important;
-            transition: all 0.3s ease !important;
-            backdrop-filter: blur(10px) !important;
-        }}
-        
-        button[kind="header"]:hover {{
-            background: rgba(255, 255, 255, 0.4) !important;
-            transform: translateY(-2px) !important;
-        }}
+        {css_content}
         
         .stApp {{
             background-image: url("data:image/png;base64,{img_base64}");
@@ -87,89 +37,12 @@ if os.path.exists(img_path):
             background-repeat: no-repeat;
             background-attachment: fixed;
         }}
-        
-        /* Rendre la sidebar transparente */
-        [data-testid="stSidebar"] {{
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }}
-        
-        /* Bouton toggle sidebar flottant */
-        .sidebar-toggle {{
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 999999;
-            background: rgba(255, 255, 255, 0.25) !important;
-            color: #000000 !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            border-radius: 8px !important;
-            padding: 0.5rem 1rem !important;
-            transition: all 0.3s ease !important;
-            backdrop-filter: blur(10px) !important;
-            cursor: pointer;
-            font-size: 1.5rem;
-        }}
-        
-        .sidebar-toggle:hover {{
-            background: rgba(255, 255, 255, 0.4) !important;
-            transform: translateY(-2px) !important;
-        }}
-        
-        /* Texte de la sidebar en noir */
-        [data-testid="stSidebar"] * {{
-            color: #000000 !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        }}
-        
-        /* Améliorer la lisibilité du texte sur l'image */
-        .main .block-container {{
-            background: rgba(255, 255, 255, 0.3);
-            padding: 2rem;
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-        }}
-        
-        /* Police moderne et texte noir pour tout le contenu */
-        * {{
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        }}
-        
-        h1, h2, h3, h4, h5, h6 {{
-            color: #000000 !important;
-            font-weight: 700 !important;
-        }}
-        
-        p, div, span, label {{
-            color: #000000 !important;
-        }}
-        
-        /* Boutons avec style moderne type Apple liquid */
-        .stButton > button {{
-            background: rgba(255, 255, 255, 0.25) !important;
-            color: #000000 !important;
-            font-weight: 600 !important;
-            border-radius: 12px !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 0.75rem 2rem !important;
-            transition: all 0.3s ease !important;
-            backdrop-filter: blur(10px) !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-        }}
-        
-        .stButton > button:hover {{
-            background: rgba(255, 255, 255, 0.4) !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
-        }}
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Bienvenue sur notre application d'analyse")
+st.title("Bienvenue sur TelecomCarbon ! 🌿")
 
-st.markdown("Veuillez choisir l'une des pages ci-dessous pour continuer.")
+# st.markdown("Choississez une application ci-dessous.")
 
 # Créer des colonnes pour les boutons
 col1, col2 = st.columns(2)
@@ -179,13 +52,79 @@ with col1:
     st.write("Mesurez l'empreinte carbone de vos prompts.")
     if st.button("Aller au comparateur"):
         # Cette fonction change de page programmatiquement
-        st.switch_page("pages/3_🍃_Comparateur_d_Empeinte_Carbone_de_LLM.py")
+        st.switch_page("pages/3_🍃_PromptCarbon.py")
 
 with col2:
     st.subheader("🌍 CodeCarbon")
     st.write("Mesurez l'empreinte carbone de vos scripts.")
     if st.button("Lancer le calculateur"):
-        st.switch_page("pages/2_🌍_Calculateur_d_Empreinte_Carbone_De_Code.py")
+        st.switch_page("pages/2_🌍_CodeCarbon.py")
 
 # La barre latérale affichera également la navigation
 st.sidebar.success("Sélectionnez une page ci-dessus.")
+
+# Ajouter un graphique interactif Plotly
+st.markdown("---")
+st.markdown("### Impact environnemental du numérique")
+
+# Données d'exemple pour le graphique
+fig = go.Figure()
+
+# Données d'exemple : émissions CO2 par activité numérique (en g CO2)
+activities = ['Streaming 1h', 'Requête web', 'Email simple', 'Email avec PJ', 'Visio 1h']
+emissions = [36, 0.2, 4, 50, 150]
+
+fig.add_trace(go.Bar(
+    x=activities,
+    y=emissions,
+    marker=dict(
+        color=emissions,
+        colorscale='Greens',
+        showscale=True,
+        colorbar=dict(title="g CO2")
+    ),
+    text=[f"{e} g" for e in emissions],
+    textposition='auto',
+))
+
+fig.update_layout(
+    title="Empreinte carbone d'activités numériques courantes",
+    xaxis_title="Activité",
+    yaxis_title="Emissions CO2 (grammes)",
+    plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(255,255,255,0.3)',
+    font=dict(color='#000000', family='Righteous'),
+    height=500,
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+# Ajouter un espacement pour permettre le scroll
+st.markdown("<div style='height: 50vh;'></div>", unsafe_allow_html=True)
+
+# Ajouter un footer beige
+st.markdown("""
+<div class="custom-footer">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div style="margin: 1rem;">
+            <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">Contact</h3>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="mailto:antoine.bretzner@telecomnancy.eu" style="color: #333333; text-decoration: none;">antoine.bretzner@telecomnancy.eu</a></p>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="mailto:chloe.wiatt@telecomnancy.eu" style="color: #333333; text-decoration: none;">chloe.wiatt@telecomnancy.eu</a></p>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="mailto:lucie.correia@telecomnancy.eu" style="color: #333333; text-decoration: none;">lucie.correia@telecomnancy.eu</a></p>
+            </div>
+        <div style="margin: 1rem;">
+            <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">À propos</h3>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="https://telecomnancy.univ-lorraine.fr/" target="_blank" style="color: #333333; text-decoration: none;"><u>Telecom Nancy</u></a></p>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="https://www.loria.fr/fr/" target="_blank" style="color: #333333; text-decoration: none;"><u>LORIA</u></a></p>
+        </div>
+        <div style="margin: 1rem;">
+            <h3 style="color: #000000; margin-bottom: 1rem; font-weight: 700;">Liens utiles</h3>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="https://codecarbon.io/" target="_blank" style="color: #333333; text-decoration: none;"><u>CodeCarbon Documentation</u></a></p>
+            <p style="color: #333333; margin: 0.5rem 0;"><a href="https://arxiv.org/pdf/2309.14393" target="_blank" style="color: #333333; text-decoration: none;"><u>LLMCarbon Paper</u></a></p>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(0, 0, 0, 0.1);">
+        <p style="color: #666666;">© 2025 Telecom Nancy. Tous droits réservés.</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
