@@ -64,6 +64,18 @@ def create_model_comparison_chart():
     # Fusionner
     model_stats = model_stats.merge(model_counts, on='model')
     
+    # Palette de couleurs vert/olive
+    colors = [
+        'rgb(85,107,47)',   # DarkOliveGreen
+        'rgb(107,142,35)',  # OliveDrab
+        'rgb(154,205,50)',  # YellowGreen
+        'rgb(189,183,107)', # DarkKhaki
+        'rgb(222,184,135)'  # Burlywood
+    ]
+    
+    # Assigner une couleur à chaque modèle
+    model_colors = [colors[i % len(colors)] for i in range(len(model_stats))]
+    
     # Créer le graphique à double axe
     fig = go.Figure()
     
@@ -73,15 +85,8 @@ def create_model_comparison_chart():
         y=model_stats['carbon'],
         name='Émissions CO₂ (gCO₂e)',
         marker=dict(
-            color=model_stats['carbon'],
-            colorscale='Reds',
-            showscale=True,
-            colorbar=dict(
-                title="gCO₂e",
-                x=1.15,
-                len=0.4,
-                y=0.75
-            )
+            color=model_colors,
+            line=dict(color='rgba(255,255,255,0.3)', width=1)
         ),
         text=[f"{c:.3f} g<br>({n} appels)" for c, n in zip(model_stats['carbon'], model_stats['count'])],
         textposition='auto',
@@ -98,19 +103,11 @@ def create_model_comparison_chart():
         name='Temps de réponse (s)',
         mode='lines+markers',
         marker=dict(
-            size=10,
-            color=model_stats['tdev_seconds'],
-            colorscale='Blues',
-            showscale=True,
-            colorbar=dict(
-                title="secondes",
-                x=1.15,
-                len=0.4,
-                y=0.25
-            ),
-            line=dict(width=2, color='white')
+            size=18,
+            color='rgb(0,0,0)',
+            line=dict(width=4, color='rgb(255,255,255)')
         ),
-        line=dict(width=3, color='rgba(66, 135, 245, 0.8)'),
+        line=dict(width=7, color='rgb(0,0,0)', dash='solid'),
         hovertemplate='<b>%{x}</b><br>' +
                       'Temps: %{y:.3f} s<br>' +
                       '<extra></extra>',
@@ -136,8 +133,8 @@ def create_model_comparison_chart():
         ),
         yaxis=dict(
             title='Émissions CO₂ (gCO₂e)',
-            title_font=dict(size=14, color='#cc0000'),
-            tickfont=dict(size=11, color='#cc0000'),
+            title_font=dict(size=14, color='#000000'),
+            tickfont=dict(size=11, color='#000000'),
             side='left',
             gridcolor='rgba(200,200,200,0.2)',
             showgrid=True,
@@ -145,12 +142,14 @@ def create_model_comparison_chart():
         ),
         yaxis2=dict(
             title='Temps de réponse (secondes)',
-            title_font=dict(size=14, color='#4287f5'),
-            tickfont=dict(size=11, color='#4287f5'),
+            title_font=dict(size=14, color='#000000'),
+            tickfont=dict(size=11, color='#000000'),
             overlaying='y',
             side='right',
-            showgrid=False,
-            zeroline=False
+            showgrid=True,
+            gridcolor='rgba(0,0,0,0.1)',
+            zeroline=False,
+            showticklabels=True
         ),
         legend=dict(
             x=0.5,
@@ -163,10 +162,10 @@ def create_model_comparison_chart():
             bordercolor='rgba(255,255,255,0.4)',
             borderwidth=1
         ),
-        paper_bgcolor='rgba(255,255,255,0.25)',
+        paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         height=600,
-        margin=dict(l=60, r=80, t=80, b=120),
+        margin=dict(l=80, r=120, t=80, b=120),
         hovermode='x unified',
         font=dict(family='Righteous')
     )
