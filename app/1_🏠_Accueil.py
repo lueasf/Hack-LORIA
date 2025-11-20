@@ -437,7 +437,7 @@ comp1, comp2, comp3 = st.columns(3)
 with comp1:
     st.markdown("""
         <div style='text-align: center;'>
-            <div style='font-size: 3rem;'>🏎️</div>
+            <div style='font-size: 3rem; filter: grayscale(50%);'>🏎️</div>
             <div style='font-weight: bold; margin-top: 0.5rem;'>50x le tour de la Terre</div>
             <div class='grey-caption'>En voiture thermique</div>
         </div>
@@ -446,7 +446,7 @@ with comp1:
 with comp2:
     st.markdown("""
         <div style='text-align: center;'>
-            <div style='font-size: 3rem;'>🥩</div>
+            <div style='font-size: 3rem; filter: grayscale(50%);'>🥩</div>
             <div style='font-weight: bold; margin-top: 0.5rem;'>60 000 Steaks</div>
             <div class='grey-caption'>Jetés à la poubelle</div>
         </div>
@@ -455,7 +455,7 @@ with comp2:
 with comp3:
     st.markdown("""
         <div style='text-align: center;'>
-            <div style='font-size: 3rem;'>🧊</div>
+            <div style='font-size: 3rem; filter: grayscale(50%);'>🧊</div>
             <div style='font-weight: bold; margin-top: 0.5rem;'>3 Terrains de tennis</div>
             <div class='grey-caption'>De banquise fondus</div>
         </div>
