@@ -5,7 +5,7 @@ import os
 import plotly.graph_objects as go
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from backend.map import create_carbon_intensity_map
+from backend.plot import create_carbon_intensity_map, create_lightbulb_chart, create_numeric_activity
 
 st.set_page_config(
     page_title="Accueil",
@@ -207,44 +207,19 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Ajouter un espacement pour permettre le scroll avant le graphique
 st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
 
-# Ajouter un graphique interactif Plotly
+
 st.markdown("---")
+
 st.markdown("### Impact environnemental du numérique")
+fig_numeric_activity = create_numeric_activity()
+st.plotly_chart(fig_numeric_activity, use_container_width=True)
 
-# Données d'exemple pour le graphique
-fig = go.Figure()
 
-# Données d'exemple : émissions CO2 par activité numérique (en g CO2)
-activities = ['Streaming 1h', 'Requête web', 'Email simple', 'Email avec PJ', 'Visio 1h']
-emissions = [36, 0.2, 4, 50, 150]
-
-fig.add_trace(go.Bar(
-    x=activities,
-    y=emissions,
-    marker=dict(
-        color=emissions,
-        colorscale='Greens',
-        showscale=True,
-        colorbar=dict(title="g CO2")
-    ),
-    text=[f"{e} g" for e in emissions],
-    textposition='auto',
-))
-
-fig.update_layout(
-    title="Empreinte carbone d'activités numériques courantes",
-    xaxis_title="Activité",
-    yaxis_title="Emissions CO2 (grammes)",
-    plot_bgcolor='rgba(0,0,0,0)',
-    paper_bgcolor='rgba(0,0,0,0)',
-    font=dict(color='#000000', family='Righteous'),
-    height=500,
-)
-
-st.plotly_chart(fig, use_container_width=True)
+st.markdown("### Impact environnemental de l'entraînement des LLMs")
+fig_lightbulb = create_lightbulb_chart()
+st.plotly_chart(fig_lightbulb, use_container_width=True)
 
 # Ajouter un espacement
-st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
 
 # Ajouter la carte du mix énergétique
 st.markdown("### Mix Énergétique Mondial")
