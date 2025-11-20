@@ -82,20 +82,38 @@ def update_sidebar_stats():
         st.write("") # Petit espacement
 
         if current_data:
+            # 1. Calculs des données brutes
             total_calls = len(current_data)
             total_carbon = sum(entry['carbon'] for entry in current_data)
             avg_carbon = total_carbon / total_calls
             avg_time = sum(entry['tdev_seconds'] for entry in current_data) / total_calls
 
             st.markdown("### Statistiques de la session")
-            
             st.metric("Appels totaux", total_calls)
-        
-            st.metric("Émissions totales", f"{total_carbon:.2f} gCO₂e")
-        
-            st.metric("Moyenne par appel", f"{avg_carbon:.2f} gCO₂e")
-        
+            st.metric("Émissions totales", f"{total_carbon:.4f} gCO₂e") # Précision augmentée
+            st.metric("Moyenne par appel", f"{avg_carbon:.4f} gCO₂e")
             st.metric("Temps moyen", f"{avg_time:.2f} s")
+
+            FACTOR_LED_G_PER_H = 1.3   # ~1.3 g par heure pour une LED 10W (mix moyen)
+            FACTOR_CAR_G_PER_M = 0.12  # ~120 g/km soit 0.12 g/m pour une voiture
+
+            equiv_led_hours = total_carbon / FACTOR_LED_G_PER_H
+            equiv_car_meters = total_carbon / FACTOR_CAR_G_PER_M
+
+            st.markdown("### Équivalences")
+            
+            # Affichage dynamique
+            st.metric(
+                "💡 Ampoule LED (10W)", 
+                f"{equiv_led_hours:.2f} h", 
+                help="Temps d'éclairage équivalent (Facteur: 1.3g/h)"
+            )
+            
+            st.metric(
+                "🚗 Voiture thermique", 
+                f"{equiv_car_meters:.2f} m", 
+                help="Distance parcourue équivalente (Facteur: 0.12g/m)"
+            )
         else:
             st.caption("Aucune donnée de session.")
 
