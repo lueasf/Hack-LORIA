@@ -320,6 +320,59 @@ def create_adoption_chart():
     )
     return fig
 
+def create_camenbert():
+    """
+    Crée un graphique Donut montrant les parts de marché estimées 
+    des LLM (basé sur le trafic web/adoption grand public - Sources: SimilarWeb/a16z).
+    """
+    # Données estimatives basées sur le trafic web mondial (fin 2024/début 2025)
+    labels = [
+        'ChatGPT (OpenAI)', 
+        'Gemini (Google)', 
+        'Claude (Anthropic)', 
+        'Perplexity / Copilot', 
+        'Autres (Llama, Mistral...)'
+    ]
+    
+    values = [65, 15, 8, 7, 5] 
+    
+    # Couleurs dans les tons olive/vert pour cohérence avec la carte
+    colors = [
+        'rgb(85,107,47)',   # ChatGPT - DarkOliveGreen (vert olive foncé)
+        'rgb(107,142,35)',  # Gemini - OliveDrab (olive moyen)
+        'rgb(154,205,50)',  # Claude - YellowGreen (vert lumineux)
+        'rgb(189,183,107)', # Perplexity/Copilot - DarkKhaki (olive pâle)
+        'rgb(222,184,135)'  # Autres - Burlywood (ton sable)
+    ]
+
+    fig_pie = go.Figure(data=[go.Pie(
+        labels=labels, 
+        values=values, 
+        hole=.5, # Un trou un peu plus large pour un look plus moderne
+        marker=dict(colors=colors),
+        textinfo='percent', # Affiche seulement le %
+        textposition='inside', # Met le texte à l'intérieur des parts
+        hoverinfo='label+value+percent', # Info au survol
+        domain=dict(x=[0, 1], y=[0.15, 1])  # Centrer le donut verticalement
+    )])
+
+    fig_pie.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)', 
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#000', size=12), 
+        margin=dict(l=40, r=40, t=20, b=100), 
+        height=400,
+        showlegend=True,
+        legend=dict(
+            orientation="h", 
+            y=-0.2, 
+            yanchor="top",
+            x=0.5,
+            xanchor="center"
+        ) # Légende horizontale centrée en bas
+    )
+    
+    return fig_pie
 
 # Pour utiliser dans Streamlit:
 # import streamlit as st

@@ -5,7 +5,7 @@ import os
 import plotly.graph_objects as go
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from backend.plot import create_carbon_intensity_map, create_lightbulb_chart, create_numeric_activity, create_adoption_chart
+from backend.plot import create_carbon_intensity_map, create_lightbulb_chart, create_numeric_activity, create_adoption_chart, create_camenbert
 
 st.set_page_config(
     page_title="Accueil",
@@ -287,20 +287,8 @@ with col_graph1:
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with col_graph2:
-    st.markdown("### 🔌 Répartition de l'impact")
-    # Un nouveau graphique "Donut" pour varier
-    labels = ['Terminaux (PC, Tel)', 'Centres de données', 'Réseaux']
-    values = [65, 15, 20] # Chiffres approximatifs ADEME pour l'exemple
-    
-    fig_pie = go.Figure(data=[go.Pie(
-        labels=labels, values=values, hole=.4,
-        marker=dict(colors=['#2E7D32', '#66BB6A', '#A5D6A7'])
-    )])
-    fig_pie.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#000'), margin=dict(l=20, r=20, t=30, b=20), height=350,
-        showlegend=True
-    )
+    st.markdown("### 📊 Parts d'utilisations des ChatBots")
+    fig_pie = create_camenbert()
     st.plotly_chart(fig_pie, use_container_width=True)
 
 # --- LIGNE 3 : LA CARTE ---
