@@ -29,18 +29,88 @@ if os.path.exists(img_path):
         css_content = f.read()
     
     # Appliquer le CSS avec l'image de fond
+    # Appliquer le CSS avec l'image de fond
     st.markdown(f"""
-    <style>
-        {css_content}
-        
-        .stApp {{
-            background-image: url("data:image/png;base64,{img_base64}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }}
-    </style>
+        <style>
+            {css_content}
+            
+            .stApp {{
+                background-image: url("data:image/png;base64,{img_base64}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+
+            /* Centrer les boutons (Fix précédent) */
+            div.stButton {{
+                display: flex;
+                justify-content: center;
+            }}
+            
+            /* Style de la flèche de scroll */
+            .scroll-down {{
+                text-align: center;
+                margin-top: 2rem;
+                cursor: pointer;
+                animation: bounce 2s infinite;
+            }}
+            
+            .scroll-down a {{
+                text-decoration: none;
+                color: #000000;
+                font-size: 2rem;
+                font-weight: bold;
+
+                /* STYLE APPLE LIQUID (Glassmorphism) */
+                background: rgba(255, 255, 255, 0.25); /* Transparent mais visible */
+                backdrop-filter: blur(15px);           /* Le flou d'arrière-plan */
+                border: 1px solid rgba(255, 255, 255, 0.3); /* Bordure subtile */
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce */
+
+                /* Forme ronde */
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+
+                /* Centrage et AJUSTEMENT VERTICAL */
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding-top: 12px; /* <-- J'ai augmenté cette valeur pour descendre la flèche */
+                transition: all 0.3s ease; /* Animation fluide au survol */
+            }}
+
+            /* Petit bonus : effet au survol */
+            .scroll-down a:hover {{
+                background: rgba(255, 255, 255, 0.4);
+                transform: scale(1.1);
+            }}
+
+            @keyframes bounce {{
+                0%, 20%, 50%, 80%, 100% {{transform: translateY(0);}}
+                40% {{transform: translateY(-10px);}}
+                60% {{transform: translateY(-5px);}}
+            }}
+
+            /* Style pour le conteneur des outils (Effet verre) */
+            .tools-container {{
+                background: rgba(255, 255, 255, 0.85); /* Fond blanc très opaque */
+                border-radius: 20px;
+                padding: 3rem 2rem;
+                margin-top: 2rem;
+                margin-bottom: 4rem;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+            }}
+            
+            .tool-title {{
+                color: #2E7D32; /* Vert forêt pour le titre */
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }}
+        </style>
     """, unsafe_allow_html=True)
 
 # Barre de navigation en haut
@@ -72,27 +142,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Centrer le titre avec marge négative pour compenser la navbar
-st.markdown("<div style='margin-top: -1rem;'><h1 style='text-align: center;'>Mesurez. Comprenez. Réduisez.</h1></div>", unsafe_allow_html=True)
+st.markdown("<div style='margin-top: -1rem;'><h1 style='text-align: center; font-size: 4rem'>Mesurez. Comprenez. Réduisez.</h1></div>", unsafe_allow_html=True)
 
 # st.markdown("Choississez une application ci-dessous.")
 
-# Créer des colonnes pour centrer les boutons
-col_spacer1, col1, col2, col_spacer2 = st.columns([1, 2, 2, 1])
-
-with col1:
-    st.subheader("🍃 PromptCarbon")
-    st.write("Mesurez l'empreinte carbone de vos prompts.")
-    if st.button("Aller au comparateur"):
-        # Cette fonction change de page programmatiquement
-        st.switch_page("pages/3_🍃_PromptCarbon.py")
-
-with col2:
-    st.subheader("🌍 CodeCarbon")
-    st.write("Mesurez l'empreinte carbone de vos scripts.")
-    if st.button("Lancer le calculateur"):
-        st.switch_page("pages/2_⚙️_CodeCarbon.py")
-
 # Ajouter une citation centrée dans un encadré transparent
+# Ajouter une citation centrée + LA FLÈCHE
 st.markdown("""
 <div style="
     background: rgba(255, 255, 255, 0.25);
@@ -102,7 +157,7 @@ st.markdown("""
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin: 10rem auto;
+    margin: 3rem auto 1rem auto; /* Marge du bas réduite pour la flèche */
     max-width: 800px;
 ">
     <p style="font-size: 1.2rem; font-style: italic; color: #000000; margin: 0;">
@@ -113,7 +168,41 @@ st.markdown("""
         — Notre engagement pour un numérique responsable
     </p>
 </div>
+
+<!-- La Flèche qui pointe vers l'ancre #nos-outils -->
+<div class="scroll-down">
+    <a href="#nos-outils">﹀</a>
+</div>
 """, unsafe_allow_html=True)
+
+# Espacement pour laisser la flèche respirer
+st.markdown("<div style='height: 5vh;'></div>", unsafe_allow_html=True)
+
+# --- DÉBUT DE LA SECTION OUTILS ---
+
+# Ancre invisible pour le lien de la flèche
+st.markdown("<div id='nos-outils' style='position: relative; top: -50px; visibility: hidden;'></div>", unsafe_allow_html=True)
+
+st.markdown("<h2 style='text-align: center; margin-bottom: 2rem; color: #000;'>Nos solutions de mesure</h2>", unsafe_allow_html=True)
+
+# Créer des colonnes pour centrer les boutons
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("<h3 class='tool-title' style='text-align: center;'>🍃 PromptCarbon</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 1.1rem; margin-bottom: 1.5rem;'>Estimez l'empreinte carbone générée par vos requêtes LLM.</p>", unsafe_allow_html=True)
+    if st.button("Aller au comparateur", use_container_width=True):
+        st.switch_page("pages/3_🍃_PromptCarbon.py")
+
+with col2:
+    st.markdown("<h3 class='tool-title' style='text-align: center;'>🌍 CodeCarbon</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 1.1rem; margin-bottom: 1.5rem;'>Intégrez le tracking carbone directement dans vos scripts Python.</p>", unsafe_allow_html=True)
+    if st.button("Lancer le calculateur", use_container_width=True):
+        st.switch_page("pages/2_⚙️_CodeCarbon.py")
+
+# On ferme le conteneur visuel
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 # Ajouter un espacement pour permettre le scroll avant le graphique
 st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
