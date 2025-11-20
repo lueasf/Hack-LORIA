@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import base64
 import math
+from datetime import datetime
 
 def create_numeric_activity():
     # Données d'exemple pour le graphique
@@ -27,13 +28,20 @@ def create_numeric_activity():
     ))
 
     fig.update_layout(
-        title="Empreinte carbone d'activités numériques courantes",
-        xaxis_title="Activité",
-        yaxis_title="Emissions CO2 (grammes)",
+        xaxis=dict(
+            title="Activité",
+            title_font=dict(color='#000000'),
+            tickfont=dict(color='#000000')
+        ),
+        yaxis=dict(
+            title="Emissions CO2 (grammes)",
+            title_font=dict(color='#000000'),
+            tickfont=dict(color='#000000')
+        ),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='#000000', family='Righteous'),
-        height=500,
+        height=400,
     )
     return fig
 
@@ -106,8 +114,9 @@ def create_carbon_intensity_map():
         colorbar=dict(
             title=dict(
                 text="Intensité carbone<br>(gCO2eq/kWh)",
-                font=dict(size=14)
+                font=dict(size=14, color='#000000')
             ),
+            tickfont=dict(color='#000000'),
             thickness=20,
             len=0.7,
             x=1.02
@@ -129,12 +138,15 @@ def create_carbon_intensity_map():
             showframe=False,
             showcoastlines=True,
             projection_type='natural earth',
-            bgcolor='rgba(0,0,0,0)'
+            bgcolor='rgba(0,0,0,0)',
+            landcolor='rgba(200,200,200,0.3)',
+            coastlinecolor='#000000'
         ),
         height=600,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=0, r=0, t=50, b=0)
+        margin=dict(l=0, r=0, t=50, b=0),
+        font=dict(color='#000000')
     )
     
     return fig
@@ -218,16 +230,11 @@ def create_lightbulb_chart():
             text=f"<b>{val} MWh</b>",
             showarrow=False,
             yshift=20, # Décale le texte un peu vers le haut (en pixels)
-            font=dict(size=14, color="black")
+            font=dict(size=14, color="#000000")
         )
 
     # --- Layout Épuré ---
     fig.update_layout(
-        title=dict(
-            text="Impact énergétique de l'entraînement d'un LLM",
-            x=0.5, # Titre centré
-            font=dict(size=20, color='#000000')
-        ),
         height=600,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -241,6 +248,7 @@ def create_lightbulb_chart():
             showgrid=False,
             zeroline=False,
             fixedrange=True,
+            tickfont=dict(color='#000000'),
             # On définit manuellement les limites de l'axe X.
             # Il y a 5 catégories (indices 0 à 4).
             # On commence à -0.6 (pour la marge gauche)
@@ -248,10 +256,59 @@ def create_lightbulb_chart():
             range=[-0.6, len(categories) - 1 + 0.6] 
         ),
         # Vous pouvez aussi augmenter la marge droite globale si ça ne suffit pas
-        margin=dict(l=20, r=50, t=80, b=20) 
+        margin=dict(l=20, r=50, t=0, b=20),
+        font=dict(color='#000000')
     )
 
     return fig
+
+
+def create_adoption_chart():
+    dates = [
+        datetime(2022, 11, 30), datetime(2023, 1, 31), 
+        datetime(2025, 2, 28), datetime(2025, 10, 31), datetime(2026, 12, 31)
+    ]
+    users_in_millions = [0, 100, 400, 800, 1000]
+    annotations_text = [
+        "<b>Lancement</b><br>1M en 5j", "<b>Record</b><br>100M / mois",
+        "400M / sem.", "800M / sem.", "<b>Projection</b><br>> 1 Md"
+    ]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=dates, y=users_in_millions, mode='lines+markers', name="Utilisateurs",
+        line=dict(color='#2E7D32', width=4, shape='spline'), # J'ai mis vert pour rester dans le thème
+        marker=dict(color='#1B5E20', size=10, symbol='circle-open-dot'),
+        hovertemplate="<b>%{x|%B %Y}</b><br>%{y} millions<extra></extra>"
+    ))
+
+    for i, txt in enumerate(annotations_text):
+        fig.add_annotation(
+            x=dates[i], y=users_in_millions[i], text=txt, showarrow=True, arrowhead=4,
+            ax=0, ay=-40 - (i % 2 * 25),
+            font=dict(size=12, color="#333"),
+            bgcolor="rgba(255,255,255,0.8)", bordercolor="#2E7D32", borderwidth=1
+        )
+
+    fig.update_layout(
+        title=dict(text="<b>L'adoption fulgurante des LLM</b>", font=dict(size=20)),
+        yaxis_title="Millions d'utilisateurs",
+        # Ajout de la configuration explicite des axes en noir
+        xaxis=dict(
+            tickfont=dict(color='#000000'),
+            title_font=dict(color='#000000')
+        ),
+        yaxis=dict(
+            tickfont=dict(color='#000000'),
+            title_font=dict(color='#000000')
+        ),
+        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', # Fond transparent
+        font=dict(family="Helvetica, sans-serif", color="black"),
+        hovermode="x unified", height=450,
+        margin=dict(l=20, r=60, t=50, b=20)
+    )
+    return fig
+
 
 # Pour utiliser dans Streamlit:
 # import streamlit as st
@@ -259,3 +316,5 @@ def create_lightbulb_chart():
 # 
 # fig = create_carbon_intensity_map()
 # st.plotly_chart(fig, use_container_width=True)
+
+

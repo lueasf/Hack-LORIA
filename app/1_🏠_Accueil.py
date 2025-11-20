@@ -5,7 +5,7 @@ import os
 import plotly.graph_objects as go
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from backend.plot import create_carbon_intensity_map, create_lightbulb_chart, create_numeric_activity
+from backend.plot import create_carbon_intensity_map, create_lightbulb_chart, create_numeric_activity, create_adoption_chart
 
 st.set_page_config(
     page_title="Accueil",
@@ -156,6 +156,75 @@ if os.path.exists(img_path):
             font-weight: 700;
             color: #1a1a1a;
         }}
+
+        /* --- STYLE SPÉCIFIQUE POUR LES NOUVEAUX CHIFFRES --- */
+        
+        /* Grille des cerveaux */
+        .brain-grid {{
+            display: grid;
+            grid-template-columns: repeat(7, 1fr); /* 7 cerveaux par ligne */
+            gap: 5px;
+            margin-top: 10px;
+            justify-items: center;
+        }}
+        .brain-icon {{
+            font-size: 1.5rem;
+            filter: grayscale(0.3);
+            transition: transform 0.2s;
+        }}
+        .brain-icon:hover {{
+            transform: scale(1.5);
+            filter: grayscale(0);
+        }}
+
+        /* La carte "Politesse" large */
+        .wide-card {{
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }}
+        
+        .comparison-container {{
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }}
+        
+        .comparison-item {{
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+        }}
+        
+        .comp-icon {{
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }}
+        
+        .comp-text {{
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9rem;
+        }}
+        
+        .highlight-number {{
+            color: #d32f2f; /* Un rouge pour le côté impact négatif */
+            font-weight: 800;
+            font-size: 1.2rem;
+        }}
+
+        .grey-caption {{
+            color: #CCCCCC !important;
+            font-size: 0.8rem;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -192,7 +261,6 @@ st.markdown("<div style='margin-top: -1rem;'><h1 style='text-align: center; font
 
 # st.markdown("Choississez une application ci-dessous.")
 
-# Ajouter une citation centrée dans un encadré transparent
 # Ajouter une citation centrée + LA FLÈCHE
 st.markdown("""
 <div style="
@@ -277,17 +345,28 @@ def display_kpi(value, label, subtext=""):
 # Espacement
 st.markdown("<div style='height: 8vh;'></div>", unsafe_allow_html=True)
 
+st.markdown("---")
+
+
 # --- TITRE DE SECTION ---
 st.markdown("<div class='section-header'>Panorama de l'Impact Numérique</div>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; margin-bottom: 3rem; font-size: 1.1rem; color: #444;'>Comprendre l'échelle du problème est la première étape vers la solution.</p>", unsafe_allow_html=True)
+# Autre choix possible pour le sous titre / texte
+# st.markdown("""
+#     <p style='text-align: center; margin-bottom: 3rem; font-size: 1.15rem; color: #4a4a4a; max-width: 900px; margin-left: auto; margin-right: auto; line-height: 1.6;'>
+#         Bien que souvent perçu comme immatériel, le monde numérique repose sur une infrastructure physique colossale. 
+#         Voici quelques chiffres pour visualiser l'invisible.
+#     </p>
+# """, unsafe_allow_html=True)
+
 
 # --- LIGNE 1 : LES CHIFFRES CLÉS (4 colonnes) ---
 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
 with kpi1:
-    display_kpi("2,5 milliards", "de prompts par jour", "uniquement sur ChatGPT")
+    display_kpi("4%", "Émissions Mondiales", "Plus que l'aviation civile")
 with kpi2:
-    display_kpi("21", "Cerveaux Humains", "C'est le nombre de neurones de GPT-4")
+    display_kpi("+9%", "Croissance Annuelle", "De l'empreinte numérique")
 with kpi3:
     display_kpi("10%", "Électricité Mondiale", "Consommée par le numérique")
 with kpi4:
@@ -296,25 +375,100 @@ with kpi4:
 # Espacement
 st.markdown("<div style='height: 3rem;'></div>", unsafe_allow_html=True)
 
-# --- LIGNE 2 : GRAPHIQUES CÔTE À CÔTE ---
+# --- LIGNE 2 : Volume & Complexité ---
+c1, c2 = st.columns(2, gap="large")
+
+with c1:
+    st.markdown("<h2 style='text-align: center;'>Déluge de données</h2>", unsafe_allow_html=True)
+    # On utilise du Markdown simple avec couleur pour simuler une "Big Metric"
+    st.markdown("""
+        <div style='text-align: center; padding: 20px;'>
+            <span style='font-size: 4.5rem; font-weight: 800; color: #1a1a1a;'>2.5 Mds</span><br>
+            <span style='font-size: 1.5rem; color: #2E7D32; font-weight: bold;'>de prompts / jour</span>
+            <p style='color: #666; margin-top: 10px;'>Générés uniquement sur ChatGPT.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with c2:
+    st.markdown("<h2 style='text-align: center;'>Complexité de GPT-4</h2>", unsafe_allow_html=True)
+    st.write("Comparaison en équivalent de neurones humains (21 cerveaux) :")
+    
+    # Astuce : On génère une chaine de caractères avec 21 cerveaux
+    # C'est du texte pur, donc Streamlit l'affiche sans bug
+    brains = "🧍‍♂️​ " * 21
+    st.markdown(f"<div style='font-size: 2rem; line-height: 1.5; text-align: center; filter: brightness(0);'>{brains}</div>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #666; font-style: italic;'>Un modèle massif pour des questions parfois futiles...</p>", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# 1. Graphique d'Adoption (Pleine largeur pour bien lire les dates)
+st.markdown("### 📈 Une croissance sans précédent")
+st.markdown("<p style='color: #666; margin-bottom: 1rem;'>La demande explose, entraînant une augmentation mécanique de la consommation.</p>", unsafe_allow_html=True)
+fig_adoption = create_adoption_chart()
+st.plotly_chart(fig_adoption, use_container_width=True)
+
+st.markdown("---")
+
+# 2. Graphique Ampoules (Pleine largeur pour bien comparer)
+st.markdown("### ⚡ Le coût énergétique de l'entraînement")
+st.markdown("<p style='color: #666; margin-bottom: 1rem;'>Créer ces modèles demande une quantité d'énergie colossale, bien avant leur première utilisation.</p>", unsafe_allow_html=True)
+
+fig_lightbulb = create_lightbulb_chart()
+st.plotly_chart(fig_lightbulb, use_container_width=True)
+
+# --- LIGNE 3 : La Politesse (Section dédiée) ---
+st.markdown("### Le coût caché de la politesse")
+st.markdown(
+    "<p style='text-align: center; font-size: 1.1rem;'>125 millions de prompts par jour servent uniquement à dire 'Bonjour' ou 'Merci'.</p>", 
+    unsafe_allow_html=True
+)
+
+# Le gros chiffre rouge au milieu
+st.markdown("""
+    <div style='text-align: center; margin: 2rem 0;'>
+        <span style='font-size: 4rem; font-weight: 800; color: #d32f2f;'>250 Tonnes CO2</span><br>
+        <span style='font-size: 1.2rem; color: #d32f2f; font-weight: bold;'>Gaspillées chaque jour</span>
+    </div>
+""", unsafe_allow_html=True)
+
+# Les 3 comparaisons en colonnes natives Streamlit
+comp1, comp2, comp3 = st.columns(3)
+
+with comp1:
+    st.markdown("""
+        <div style='text-align: center;'>
+            <div style='font-size: 3rem;'>🏎️</div>
+            <div style='font-weight: bold; margin-top: 0.5rem;'>50x le tour de la Terre</div>
+            <div class='grey-caption'>En voiture thermique</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with comp2:
+    st.markdown("""
+        <div style='text-align: center;'>
+            <div style='font-size: 3rem;'>🥩</div>
+            <div style='font-weight: bold; margin-top: 0.5rem;'>60 000 Steaks</div>
+            <div class='grey-caption'>Jetés à la poubelle</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with comp3:
+    st.markdown("""
+        <div style='text-align: center;'>
+            <div style='font-size: 3rem;'>🧊</div>
+            <div style='font-weight: bold; margin-top: 0.5rem;'>3 Terrains de tennis</div>
+            <div class='grey-caption'>De banquise fondus</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# --- LIGNE 4 : GRAPHIQUES CÔTE À CÔTE ---
 col_graph1, col_graph2 = st.columns([1, 1]) # 50% / 50%
 
 with col_graph1:
     st.markdown("### 📉 Activités courantes")
-    # Ton graphique existant
-    fig_bar = go.Figure()
-    activities = ['Streaming 1h', 'Requête web', 'Email simple', 'Email + PJ', 'Visio 1h']
-    emissions = [36, 0.2, 4, 50, 150]
-
-    fig_bar.add_trace(go.Bar(
-        x=activities, y=emissions,
-        marker=dict(color=emissions, colorscale='Greens', showscale=False),
-        text=[f"{e}g" for e in emissions], textposition='auto',
-    ))
-    fig_bar.update_layout(
-        plot_bgcolor='rgba(255,255,255,0.5)', paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#000'), margin=dict(l=20, r=20, t=30, b=20), height=350
-    )
+    fig_bar = create_numeric_activity()
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with col_graph2:
@@ -336,7 +490,7 @@ with col_graph2:
 
 # --- LIGNE 3 : LA CARTE ---
 st.markdown("<div style='height: 3rem;'></div>", unsafe_allow_html=True)
-st.markdown("### 🌍 Intensité Carbone du Mix Électrique")
+st.markdown("### Intensité Carbone du Mix Électrique")
 st.markdown("<p style='font-size: 0.9rem; color: #666;'>L'impact de votre code dépend de l'endroit où il s'exécute.</p>", unsafe_allow_html=True)
 
 # Ta carte existante
