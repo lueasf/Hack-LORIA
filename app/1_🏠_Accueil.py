@@ -147,7 +147,7 @@ fig.update_layout(
     xaxis_title="Activité",
     yaxis_title="Emissions CO2 (grammes)",
     plot_bgcolor='rgba(0,0,0,0)',
-    paper_bgcolor='rgba(255,255,255,0.3)',
+    paper_bgcolor='rgba(0,0,0,0)',
     font=dict(color='#000000', family='Righteous'),
     height=500,
 )

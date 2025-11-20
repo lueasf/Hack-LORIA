@@ -198,3 +198,24 @@ p, div, span, label {
     transform: translateY(-3px) !important;
     text-decoration: underline !important;
 }
+
+/* Style glassmorphism pour les graphiques Plotly */
+.stPlotlyChart {
+    background: rgba(255, 255, 255, 0.25) !important;
+    padding: 2rem !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    margin: 2rem auto !important;
+}
+
+/* Container du graphique Plotly */
+[data-testid="stPlotlyChart"] {
+    background: rgba(255, 255, 255, 0.25) !important;
+    padding: 2rem !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}

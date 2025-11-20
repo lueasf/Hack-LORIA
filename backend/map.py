@@ -95,11 +95,11 @@ def create_carbon_intensity_map():
             showframe=False,
             showcoastlines=True,
             projection_type='natural earth',
-            bgcolor='rgba(255,255,255,0)'
+            bgcolor='rgba(0,0,0,0)'
         ),
         height=600,
-        paper_bgcolor='rgba(255,255,255,0.3)',
-        plot_bgcolor='rgba(255,255,255,0.3)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=0, r=0, t=50, b=0)
     )
     
