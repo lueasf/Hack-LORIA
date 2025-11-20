@@ -3,6 +3,7 @@ import tempfile
 import subprocess
 import sys
 import os
+import base64  # Ajout de l'import manquant
 import time
 from codecarbon import EmissionsTracker
 import pandas as pd
@@ -15,12 +16,83 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Charger le CSS externe
-def load_css(file_path):
-    with open(file_path) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# --- DÉBUT BLOC STYLE ACCUEIL ---
+css_path = "app/accueil_styles.css"
 
-load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
+if os.path.exists(css_path):
+    with open(css_path) as f:
+        css_content = f.read()
+    
+    st.markdown(f"""
+        <style>
+            {css_content}
+            .stApp {{
+                /* Dégradé du vert clair vers un vert plus soutenu */
+                background: linear-gradient(135deg, #94a773 0%, #94a45a 100%);
+                background-attachment: fixed;
+            }}
+            /* Styles spécifiques pour les cartes de cette page (adaptés de styles.css) */
+            .metric-card {{
+                background: rgba(255, 255, 255, 0.6);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 1.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                margin-bottom: 1rem;
+            }}
+            .comparison-item {{
+                background: rgba(255, 255, 255, 0.6);
+                padding: 1rem;
+                border-radius: 12px;
+                margin: 0.5rem 0;
+                border-left: 4px solid #7fb069;
+            }}
+
+            /* --- NOUVEAU : Style pour les expanders (menus déroulants) en blanc --- */
+            [data-testid="stExpander"] {{
+                background-color: #ffffff !important;
+                border-radius: 8px !important;
+                border: none !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                color: #000000 !important;
+            }}
+            [data-testid="stExpander"] summary {{
+                color: #000000 !important;
+            }}
+            [data-testid="stExpander"] summary:hover {{
+                color: #333333 !important;
+            }}
+            /* Force la couleur du texte à l'intérieur en noir */
+            [data-testid="stExpander"] p, [data-testid="stExpander"] li, [data-testid="stExpander"] span, [data-testid="stExpander"] div {{
+                color: #000000 !important;
+            }}
+        </style>
+    """, unsafe_allow_html=True)
+
+# 2. Barre de navigation simplifiée (Juste le logo)
+st.markdown("""
+<div style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 999998;
+">
+    <div style="margin-left: 2rem; font-size: 1.5rem; font-weight: 700; color: #000000; font-family: 'Righteous', sans-serif;">
+        TelecomCarbon 🌿
+    </div>
+</div>
+<div style='margin-top: 3rem;'></div>
+""", unsafe_allow_html=True)
+# --- FIN BLOC STYLE ACCUEIL ---
 
 st.markdown('<h1>Carbon Footprint Analyzer for Code</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Mesurez précisément l\'empreinte carbone de vos scripts et commandes avec CodeCarbon</p>', unsafe_allow_html=True)
@@ -114,7 +186,7 @@ if run:
 
         with EmissionsTracker(project_name=project_name, output_dir=tmpdir, measure_power_secs=int(measure_power_secs)) as tracker:
             start_time = time.time()
-            st.write("Execution en cours...")
+            st.write("Exécution en cours...")
 
             for i in range(int(repetitions)):
                 try:

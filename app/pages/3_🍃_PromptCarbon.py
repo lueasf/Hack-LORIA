@@ -1,5 +1,6 @@
 import sys
 import os
+import base64 # Ajout de l'import
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 import streamlit as st
@@ -62,11 +63,103 @@ if "last_tdev" not in st.session_state:
     # dernier temps de développement (s) mesuré entre envoi et réception
     st.session_state.last_tdev = 0.0
 
-def load_css(file_path):
-    with open(file_path) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# --- DÉBUT BLOC STYLE ACCUEIL ---
+css_path = "app/accueil_styles.css"
 
-load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
+if os.path.exists(css_path):
+    with open(css_path) as f:
+        css_content = f.read()
+    
+    st.markdown(f"""
+        <style>
+            {css_content}
+            .stApp {{
+                /* Dégradé du vert clair vers un vert plus soutenu */
+                background: linear-gradient(135deg, #94a773 0%, #94a45a 100%);
+                background-attachment: fixed;
+            }}
+            /* Style pour les items de comparaison */
+            .comparison-item {{
+                background: rgba(255, 255, 255, 0.6);
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.4);
+            }}
+            
+            /* --- NOUVEAU : Style pour les expanders (menus déroulants) en blanc --- */
+            [data-testid="stExpander"] {{
+                background-color: #ffffff !important;
+                border-radius: 8px !important;
+                border: none !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                color: #000000 !important;
+            }}
+            [data-testid="stExpander"] summary {{
+                color: #000000 !important;
+            }}
+            [data-testid="stExpander"] summary:hover {{
+                color: #333333 !important;
+            }}
+            /* Force la couleur du texte à l'intérieur en noir */
+            [data-testid="stExpander"] p, [data-testid="stExpander"] li, [data-testid="stExpander"] span, [data-testid="stExpander"] div {{
+                color: #000000 !important;
+            }}
+
+            /* --- CORRECTION : Mise en valeur des chiffres (Metrics) --- */
+            
+            /* 1. Forcer la couleur BLANCHE partout (Sidebar + Main) */
+            [data-testid="stMetricValue"], [data-testid="stMetricValue"] > div, [data-testid="stMetricValue"] * {{
+                color: #ffffff !important;
+            }}
+            
+            [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] > div, [data-testid="stMetricLabel"] * {{
+                color: #f0f0f0 !important; /* Blanc cassé pour les titres */
+            }}
+
+            /* 2. Taille GÉANTE uniquement pour la zone principale */
+            section.main [data-testid="stMetricValue"] > div {{
+                font-size: 3.5rem !important; /* Encore plus gros pour bien voir */
+                font-weight: 800 !important;
+                text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }}
+            
+            section.main [data-testid="stMetricLabel"] > div {{
+                font-size: 1.2rem !important;
+            }}
+
+            /* 3. Taille NORMALE pour la sidebar (pour ne pas casser l'affichage) */
+            [data-testid="stSidebar"] [data-testid="stMetricValue"] > div {{
+                font-size: 1.8rem !important; /* Taille raisonnable */
+                text-shadow: none;
+            }}
+        </style>
+    """, unsafe_allow_html=True)
+
+st.markdown("""<div style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 999998;
+">
+    <div style="margin-left: 2rem; font-size: 1.5rem; font-weight: 700; color: #000000; font-family: 'Righteous', sans-serif;">
+        TelecomCarbon 🌿
+    </div>
+</div>
+<div style='margin-top: 3rem;'></div>
+""", unsafe_allow_html=True)
+# --- FIN BLOC STYLE ACCUEIL ---
+
+# On supprime l'ancien load_css
+# load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
 
 # Statistiques globales dans la sidebar
 
@@ -350,13 +443,20 @@ if not session_data:
 else:
     for i, entry in enumerate(session_data):
         # On utilise flex et gap pour l'espacement, et un style de badge pour chaque métrique
+        # Note : Ici on met les chiffres en vert foncé car le fond de la carte est clair
         st.markdown(f"""
-            <div class="comparison-item" style="padding: 15px; border-radius: 10px; background-color: #f0f2f6; margin-bottom: 10px;">
-                <strong style="font-size: 1.1em; display: block; margin-bottom: 8px;">Modèle : {entry['model']}</strong>
-                <div style="display: flex; flex-wrap: wrap; gap: 20px; color: #444;">
-                    <span>⏳ <b>{entry['tdev_seconds']:.2f}</b> s</span>
-                    <span>🌳 <b>{entry['carbon']:.2f}</b> gCO₂e</span>
-                    <span>💬 <b>{len(entry['response'].split())}</b> mots</span>
+            <div class="comparison-item" style="padding: 15px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.85); margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <strong style="font-size: 1.2em; display: block; margin-bottom: 12px; color: #1a4a15;">Modèle : {entry['model']}</strong>
+                <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: center;">
+                    <span style="background: #e8f5e9; padding: 5px 10px; border-radius: 8px; border: 1px solid #c8e6c9;">
+                        ⏳ <b style="color: #2e7d32; font-size: 1.2em;">{entry['tdev_seconds']:.2f}</b> <span style="color: #555">s</span>
+                    </span>
+                    <span style="background: #e8f5e9; padding: 5px 10px; border-radius: 8px; border: 1px solid #c8e6c9;">
+                        🌳 <b style="color: #1b5e20; font-size: 1.4em;">{entry['carbon']:.4f}</b> <span style="color: #555">gCO₂e</span>
+                    </span>
+                    <span style="color: #666;">
+                        💬 <b>{len(entry['response'].split())}</b> mots
+                    </span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
