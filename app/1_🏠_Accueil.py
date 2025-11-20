@@ -86,7 +86,7 @@ st.markdown("""
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin: 3rem auto 1rem auto; /* Marge du bas réduite pour la flèche */
+    margin: 15vh auto 1rem auto; /* MODIFIÉ : 3rem -> 15vh pour descendre le bloc */
     max-width: 800px;
 ">
     <p style="font-size: 1.2rem; font-style: italic; color: #000000; margin: 0;">
@@ -105,7 +105,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Espacement pour laisser la flèche respirer
-st.markdown("<div style='height: 5vh;'></div>", unsafe_allow_html=True)
+# MODIFIÉ : 5vh -> 30vh pour pousser le titre hors de l'écran au démarrage
+st.markdown("<div style='height: 30vh;'></div>", unsafe_allow_html=True)
 
 # --- DÉBUT DE LA SECTION OUTILS ---
 
