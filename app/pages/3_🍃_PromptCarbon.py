@@ -26,6 +26,12 @@ st.set_page_config(
 PROMPTS_FILE = Path("data/prompts.json")
 SESSION_FILE = Path("data/session_data.json")
 
+if "app_started" not in st.session_state:
+    save_json(SESSION_FILE, [])
+    save_json(PROMPTS_FILE, [])
+    
+    st.session_state.app_started = True
+
 PROMPTS_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 if not PROMPTS_FILE.exists():
@@ -61,6 +67,42 @@ def load_css(file_path):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 load_css(os.path.join(os.path.dirname(__file__), "styles.css"))
+
+# Statistiques globales dans la sidebar
+
+# On crée un emplacement vide dans la sidebar
+sidebar_placeholder = st.sidebar.empty()
+
+# On définit une fonction qui sait lire le JSON et remplir cet emplacement
+def update_sidebar_stats():
+    current_data = load_json(SESSION_FILE)
+    
+    # On "entre" dans le placeholder pour écrire dedans
+    with sidebar_placeholder.container():
+        st.write("") # Petit espacement
+
+        if current_data:
+            total_calls = len(current_data)
+            total_carbon = sum(entry['carbon'] for entry in current_data)
+            avg_carbon = total_carbon / total_calls
+            avg_time = sum(entry['tdev_seconds'] for entry in current_data) / total_calls
+
+            st.markdown("### Statistiques de la session")
+            
+            st.metric("Appels totaux", total_calls)
+        
+            st.metric("Émissions totales", f"{total_carbon:.2f} gCO₂e")
+        
+            st.metric("Moyenne par appel", f"{avg_carbon:.2f} gCO₂e")
+        
+            st.metric("Temps moyen", f"{avg_time:.2f} s")
+        else:
+            st.caption("Aucune donnée de session.")
+
+
+
+# On appelle la fonction une première fois pour afficher l'état actuel (avant calcul)
+update_sidebar_stats()
 
 # -----------------------------
 # CALLBACKS
@@ -246,6 +288,9 @@ if st.session_state.current_response:
                 carbon,
                 st.session_state.last_tdev,
             )
+            # Met à jour les stats dans la sidebar
+            update_sidebar_stats()
+
         # réinitialiser le marqueur pour éviter de resauvegarder lors des reruns
         st.session_state.pending_save = False
 
@@ -275,30 +320,25 @@ with st.expander("📊 Voir la chronologie de la session"):
     fig_timeline = create_session_timeline()
     st.plotly_chart(fig_timeline, use_container_width=True)
 
-# Statistiques globales
-from backend.utils import load_json
+# -------------------------------------------------
+# 6. Historique de la session
+# -------------------------------------------------
+
+st.subheader("6. Historique des appels LLM de la session")
+
 session_data = load_json(SESSION_FILE)
-
-if session_data:
-    total_calls = len(session_data)
-    total_carbon = sum(entry['carbon'] for entry in session_data)
-    avg_carbon = total_carbon / total_calls
-    avg_time = sum(entry['tdev_seconds'] for entry in session_data) / total_calls
-    
-    st.markdown("---")
-    st.markdown("### 6. Statistiques de la session")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("Appels totaux", total_calls)
-    
-    with col2:
-        st.metric("Émissions totales", f"{total_carbon:.4f} gCO₂e")
-    
-    with col3:
-        st.metric("Moyenne par appel", f"{avg_carbon:.4f} gCO₂e")
-    
-    with col4:
-        st.metric("Temps moyen", f"{avg_time:.3f} s")
-
+if not session_data:
+    st.info("Aucun appel LLM enregistré dans cette session.")
+else:
+    for i, entry in enumerate(session_data):
+        # On utilise flex et gap pour l'espacement, et un style de badge pour chaque métrique
+        st.markdown(f"""
+            <div class="comparison-item" style="padding: 15px; border-radius: 10px; background-color: #f0f2f6; margin-bottom: 10px;">
+                <strong style="font-size: 1.1em; display: block; margin-bottom: 8px;">Modèle : {entry['model']}</strong>
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; color: #444;">
+                    <span>⏳ <b>{entry['tdev_seconds']:.2f}</b> s</span>
+                    <span>🌳 <b>{entry['carbon']:.2f}</b> gCO₂e</span>
+                    <span>💬 <b>{len(entry['response'].split())}</b> mots</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
