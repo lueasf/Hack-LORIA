@@ -163,101 +163,112 @@ def create_lightbulb_chart():
 
     valeurs_mwh = [3.5, 4.7, 16, 433, 1287]
 
-    # --- Image (Votre code) ---
-    # Assurez-vous que le chemin est correct ou utilisez une URL pour le web
+    # --- Image ---
     image_path = r"app/assets/lightbulb.png"
-    # Pour l'exemple, si l'image n'est pas chargée, le code plantera, 
-    # donc assurez-vous que img_b64 est bien rempli comme dans votre code.
     with open(image_path, "rb") as f:
         img_b64 = base64.b64encode(f.read()).decode()
 
-    # --- 1. Calcul de la taille des ampoules ---
-    # Pour une représentation visuelle honnête, on lie souvent l'aire à la valeur.
-    # Donc la hauteur/largeur (size) doit être proportionnelle à la racine carrée de la valeur.
-    # Si vous préférez votre échelle LOG pour mieux voir les petites, décommentez la ligne 'Log'
-
-    # Option A : Proportionnel à la racine carrée (plus réaliste physiquement)
-    sizes_raw = [math.sqrt(v) for v in valeurs_mwh]
-
-    # Option B : Votre échelle Log (si vous voulez que les petites soient plus grosses)
-    # sizes_raw = [math.log(v) for v in valeurs_mwh]
-
-    # --- 2. Normalisation ---
-    # On veut que la plus grosse ampoule ait une taille max définie (ex: 0.8 unité de grille)
-    # pour ne pas qu'elle dépasse sur les voisins.
+    # --- Calcul des tailles avec échelle logarithmique pour mieux voir les petites valeurs ---
+    # Utilisation de log pour que les petites valeurs soient plus visibles
+    sizes_raw = [math.log(v + 1) for v in valeurs_mwh]  # +1 pour éviter log(0)
+    
+    # Normalisation : la plus grosse ampoule fait 1.2, la plus petite au moins 0.25
     max_val = max(sizes_raw)
-    max_display_size = 0.8  # La plus grosse ampoule prendra 80% de la largeur d'une colonne
-    sizes_normalized = [(s / max_val) * max_display_size for s in sizes_raw]
+    min_val = min(sizes_raw)
+    min_display_size = 0.25
+    max_display_size = 1.2
+    
+    sizes_normalized = [
+        min_display_size + ((s - min_val) / (max_val - min_val)) * (max_display_size - min_display_size)
+        for s in sizes_raw
+    ]
 
     # --- Graphique ---
     fig = go.Figure()
 
-    # On ajoute une trace invisible juste pour définir les catégories en X
-    fig.add_trace(go.Scatter(
-        x=categories,
-        y=[0] * len(categories),
-        mode="markers",
-        marker=dict(opacity=0)
-    ))
+    # Disposition en grille 3x2 pour mieux occuper l'espace
+    # Ligne 1: indices 0, 1, 2
+    # Ligne 2: indices 3, 4 (centrés)
+    positions_x = [0, 1, 2, 0.5, 1.5]  # Positions horizontales
+    positions_y = [0.7, 0.7, 0.7, -0.3, -0.3]  # Positions verticales ajustées pour mieux centrer
 
     # --- Ajout des ampoules ---
     for i, cat in enumerate(categories):
         size = sizes_normalized[i]
         val = valeurs_mwh[i]
+        x_pos = positions_x[i]
+        y_pos = positions_y[i]
         
         # Ajout de l'image
         fig.add_layout_image(
             dict(
                 source=f"data:image/png;base64,{img_b64}",
-                x=cat,
-                y=0,               # On pose tout le monde au sol (0)
+                x=x_pos,
+                y=y_pos,
                 xref="x",
                 yref="y",
-                yanchor="bottom",  # L'image grandit vers le haut à partir de 0
-                sizex=size,        # Largeur
-                sizey=size,        # Hauteur (garder le ratio carré)
-                xanchor="center",  # Centré horizontalement sur la catégorie
+                yanchor="bottom",
+                sizex=size * 0.8,  # Ajustement pour éviter les chevauchements
+                sizey=size * 0.8,
+                xanchor="center",
                 opacity=0.9,
                 layer="above"
             )
         )
         
         # Ajout du texte au-dessus de l'ampoule
-        # On place le texte à une hauteur = taille de l'image + une petite marge
         fig.add_annotation(
-            x=cat,
-            y=size, # Le haut de l'ampoule
+            x=x_pos,
+            y=y_pos + size * 0.8,
             text=f"<b>{val} MWh</b>",
             showarrow=False,
-            yshift=20, # Décale le texte un peu vers le haut (en pixels)
-            font=dict(size=14, color="#000000")
+            yshift=15,
+            font=dict(size=13, color="#000000", family="Helvetica, sans-serif"),
+            bgcolor="rgba(255,255,255,0)",
+            borderpad=4
+        )
+        
+        # Ajout du label en dessous
+        fig.add_annotation(
+            x=x_pos,
+            y=y_pos,
+            text=cat,
+            showarrow=False,
+            yshift=-30,
+            font=dict(size=11, color="#000000"),
+            xanchor="center"
         )
 
-    # --- Layout Épuré ---
+    # --- Layout optimisé ---
+    # Calculer les hauteurs réelles
+    # Ligne du haut : position 0.7 + taille max des petites ampoules (indices 0,1,2)
+    max_size_top = max(sizes_normalized[0], sizes_normalized[1], sizes_normalized[2])
+    top_limit = 0.7 + max_size_top * 0.8 + 0.08  # position + taille + marge pour texte
+    
+    # Ligne du bas : position -0.3, le bas des labels
+    bottom_limit = -0.3 - 0.15  # position + marge pour les labels en dessous
+    
     fig.update_layout(
-        height=600,
+        height=550,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        # On fixe l'axe Y manuellement pour laisser de la place à la plus grosse ampoule + texte
         yaxis=dict(
-            range=[0, max_display_size * 1.2], 
-            visible=False, # On cache l'axe Y (graduations, lignes)
-            fixedrange=True # Empêche le zoom sur Y
+            range=[bottom_limit, top_limit],  # Range ajusté au contenu réel
+            visible=False,
+            fixedrange=True,
+            scaleanchor=None
         ),
         xaxis=dict(
+            range=[-0.15, 2.25],  # Ajout d'un peu plus d'espace à droite
+            visible=False,
             showgrid=False,
             zeroline=False,
             fixedrange=True,
-            tickfont=dict(color='#000000'),
-            # On définit manuellement les limites de l'axe X.
-            # Il y a 5 catégories (indices 0 à 4).
-            # On commence à -0.6 (pour la marge gauche)
-            # On finit à 4.6 (pour laisser de la place à droite de la dernière ampoule)
-            range=[-0.6, len(categories) - 1 + 0.6] 
+            scaleanchor=None
         ),
-        # Vous pouvez aussi augmenter la marge droite globale si ça ne suffit pas
-        margin=dict(l=20, r=50, t=0, b=20),
-        font=dict(color='#000000')
+        margin=dict(l=5, r=15, t=5, b=5),  # Marge droite légèrement augmentée
+        font=dict(color='#000000', family="Helvetica, sans-serif"),
+        showlegend=False
     )
 
     return fig
