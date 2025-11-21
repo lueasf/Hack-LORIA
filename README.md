@@ -1,4 +1,4 @@
-# 🌱 Hack-LORIA : AI Carbon Monitor
+# Hack-LORIA : TelecomCarbon 🌿
 
 > **Mesurez l'impact CO₂ de votre code et de vos prompts.**
 
